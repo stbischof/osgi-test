@@ -16,10 +16,13 @@
 
 package org.osgi.test.common.filter;
 
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.function.Function;
 
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.test.common.exceptions.FunctionWithException;
 
 public class Filters {
@@ -43,4 +46,40 @@ public class Filters {
 		return createFilter.apply(filter);
 	}
 
+	/**
+	 * Creates a filter String looking for all properties in the
+	 * {@link Dictionary} given.
+	 *
+	 * @param properties the {@link Dictionary} with the service properties.
+	 * @return the {@link Filter} Object
+	 * @throws IllegalArgumentException if {@link Dictionary} is
+	 *             <code>null</code> or empty or {@link Filter} could not be
+	 *             created.
+	 */
+	public static Filter createFilter(Dictionary<String, Object> properties) {
+
+		if (properties == null || properties.isEmpty()) {
+			throw new IllegalArgumentException("Provided configuration properties are empty. Cannot create a filter");
+		}
+
+		StringBuilder sb = new StringBuilder("(&");
+		Enumeration<String> keys = properties.keys();
+		while (keys.hasMoreElements()) {
+			String key = keys.nextElement();
+			Object value = properties.get(key);
+			String valueString = value.toString();
+			valueString = valueString.replace("(", "\\(")
+				.replace(")", "\\)");
+			sb.append(String.format("(%s=%s)", key, valueString));
+		}
+		sb.append(")");
+		try {
+			return FrameworkUtil.createFilter(sb.toString());
+		} catch (InvalidSyntaxException e) {
+			throw new IllegalArgumentException("Could not create filter " + e.getFilter(), e);
+		}
+	}
+
+
 }
+
