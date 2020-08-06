@@ -58,12 +58,6 @@ public @interface WithConfiguration {
 	 */
 	String pid();
 
-	/**
-	 * Indicate the action, that will be processed to get the Configuration.
-	 *
-	 * @return The action.
-	 */
-	CmAction action() default CmAction.GET_OR_CREATE;
 
 	/**
 	 * Indicate the properties, that will be updated (if set) after selecting a

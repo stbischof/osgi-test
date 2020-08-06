@@ -17,6 +17,7 @@ package org.osgi.test.junit5.cm;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,23 +33,40 @@ import org.osgi.service.cm.ConfigurationAdmin;
 public class ConfigAdminUtil {
 
 	public static Configuration getConfigsByServicePid(ConfigurationAdmin ca, String pid) throws Exception {
-		return getConfigsByPid(ca, Constants.SERVICE_PID, pid);
+		return getConfigsByServicePid(ca, pid, 0l);
 	}
 
-	public static Configuration getConfigsByFactoryServicePid(ConfigurationAdmin ca, String pid,
-		String name)
+	public static Configuration getConfigsByServicePid(ConfigurationAdmin ca, String pid, long timeout)
 		throws Exception {
-		return getConfigsByPid(ca, ConfigurationAdmin.SERVICE_FACTORYPID, pid);
+		return getConfigsByPid(ca, Constants.SERVICE_PID, pid, timeout);
 	}
 
-	private static Configuration getConfigsByPid(ConfigurationAdmin ca, String pid_key, String value) throws Exception {
+	public static Configuration getConfigsByFactoryServicePid(ConfigurationAdmin ca, String pid, String name,
+		long timeout) throws Exception {
+		return getConfigsByPid(ca, Constants.SERVICE_PID, pid + "~" + name, timeout);
+	}
+
+	public static Configuration getConfigsByFactoryServicePid(ConfigurationAdmin ca, String pid, String name)
+		throws Exception {
+		return getConfigsByFactoryServicePid(ca, pid, name, 0l);
+	}
+
+	private static Configuration getConfigsByPid(ConfigurationAdmin ca, String pid_key, String value, long timeout)
+		throws Exception {
 		String filter = String.format("(%s=%s)", pid_key, value);
-		Configuration[] configurations = ca.listConfigurations(filter);
+		Configuration[] configurations = null;
+		final Instant endTime = Instant.now()
+			.plusMillis(timeout);
+		do {
+
+			configurations = ca.listConfigurations(filter);
+			Thread.sleep(50l);
+		} while (configurations == null && !endTime.isBefore(Instant.now()));
+
 		if (configurations == null || configurations.length == 0) {
 			return null;
 		} else {
 			return configurations[0];
-
 		}
 	}
 
@@ -72,7 +90,8 @@ public class ConfigAdminUtil {
 
 	}
 
-	static void resetConfig(ConfigurationAdmin ca, List<ConfigurationCopy> copys) throws Exception {
+	static void resetConfig(UpdateHandler timeoutListener, ConfigurationAdmin ca, List<ConfigurationCopy> copys)
+		throws Exception {
 
 		List<ConfigurationCopy> leftOvers = new ArrayList<ConfigurationCopy>(copys);
 		List<Configuration> configurations = ConfigAdminUtil.getAllConfigurations(ca);
@@ -83,9 +102,11 @@ public class ConfigAdminUtil {
 					.anyMatch((copy) -> {
 							if (Objects.equals(conf.getPid(), copy.getPid())) {
 							try {
-								conf.updateIfDifferent(copy.getProperties());
+										timeoutListener.update(conf, copy.getProperties(), 3000);
 							} catch (IOException e) {
 								throw new UncheckedIOException(e);
+									} catch (InterruptedException e) {
+										throw new RuntimeException(e);
 							}
 							leftOvers.remove(copy);
 							return true;
@@ -95,10 +116,14 @@ public class ConfigAdminUtil {
 					});
 				try {
 						if (!match) {
-							conf.delete();
+							String pid = conf.getPid();
+							timeoutListener.delete(conf, 3000);
+
 						}
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
 				}
 			});
 		leftOvers.stream()
@@ -112,14 +137,23 @@ public class ConfigAdminUtil {
 							conf = ca.getFactoryConfiguration(copy.getFactoryPid(), name, copy.getBundleLocation());
 					} else {
 							conf = ca.getConfiguration(copy.getPid(), copy.getBundleLocation());
+						}
+
+						try {
+							timeoutListener.update(conf, copy.getProperties(), 3000);
+
+						} catch (IOException e) {
+							throw new UncheckedIOException(e);
+						} catch (InterruptedException e) {
+							throw new RuntimeException(e);
 					}
-					conf.update(copy.getProperties());
+
 				} catch (IOException e) {
 					throw new UncheckedIOException(e);
 				}
 			});
 
 			// TODO: wait for async activating/deactivating of Services
-	}
+		}
 
 }

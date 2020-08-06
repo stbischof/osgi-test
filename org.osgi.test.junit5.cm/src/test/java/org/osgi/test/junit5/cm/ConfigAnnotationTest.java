@@ -18,9 +18,6 @@ package org.osgi.test.junit5.cm;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.lang.annotation.Annotation;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,7 +28,6 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.test.common.annotation.config.CmAction;
 import org.osgi.test.common.annotation.config.ConfigEntry;
 import org.osgi.test.common.annotation.config.InjectConfiguration;
 import org.osgi.test.common.annotation.config.WithConfiguration;
@@ -169,7 +165,7 @@ public class ConfigAnnotationTest {
 	}
 
 	@Test
-	@WithConfiguration(pid = FACTORY_CONFIGURATION_PID + "~" + "factory.name2", action = CmAction.CREATE, properties =
+	@WithConfiguration(pid = FACTORY_CONFIGURATION_PID + "~" + "factory.name2", properties =
 
 	{
 		@ConfigEntry(key = "foo", value = "bar")
@@ -182,39 +178,6 @@ public class ConfigAnnotationTest {
 
 		assertEquals("bar", cs.getProperties()
 			.get("foo"));
-	}
-
-	@Test
-	public void testMethodConfigurationServiceCreate() throws Exception {
-
-		WithConfiguration c = new WithConfiguration() {
-
-			@Override
-			public Class<? extends Annotation> annotationType() {
-
-				return null;
-			}
-
-			@Override
-			public ConfigEntry[] properties() {
-
-				return null;
-			}
-
-			@Override
-			public String pid() {
-
-				return "my.pid";
-			}
-
-			@Override
-			public CmAction action() {
-
-				return CmAction.CREATE;
-			}
-		};
-		assertThrows(IllegalArgumentException.class, () -> ConfigurationExtension.handleWithConfiguration(c, null));
-
 	}
 
 }

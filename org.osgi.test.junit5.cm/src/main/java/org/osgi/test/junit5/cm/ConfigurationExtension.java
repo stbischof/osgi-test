@@ -47,9 +47,10 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.test.common.annotation.config.CmAction;
+import org.osgi.service.cm.ConfigurationListener;
 import org.osgi.test.common.annotation.config.ConfigEntry;
 import org.osgi.test.common.annotation.config.InjectConfiguration;
 import org.osgi.test.common.annotation.config.WithConfiguration;
@@ -59,9 +60,11 @@ import org.osgi.test.common.dictionary.Dictionaries;
 public class ConfigurationExtension implements BeforeEachCallback, ParameterResolver,
 	org.junit.jupiter.api.extension.BeforeAllCallback, AfterAllCallback, AfterEachCallback {
 
-	private static final String						STORE_CONFIGURATION_KEY	= "store.configurationAdmin";
-	private BundleContext							bundleContext			= null;
-	private ServiceReference<ConfigurationAdmin>	sref					= null;
+	private static final String							STORE_CONFIGURATION_KEY	= "store.configurationAdmin";
+	private BundleContext								bundleContext			= null;
+	private ServiceReference<ConfigurationAdmin>		sref					= null;
+	private ServiceRegistration<ConfigurationListener>	registrationTimeoutListener;
+	private UpdateHandler								timeoutListener;
 
 	@Override
 	public void beforeEach(ExtensionContext extensionContext) throws Exception {
@@ -96,11 +99,9 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 	}
 
 	static void handleWithConfiguration(WithConfiguration configurationAnnotation,
-		ConfigurationAdmin configurationAdmin) throws ParameterResolutionException, IllegalArgumentException {
-
-		if (!isFactory(configurationAnnotation) && CmAction.CREATE.equals(configurationAnnotation.action())) {
-			throw new IllegalArgumentException("Only FactoryConfiguration could be created");
-		}
+		ConfigurationAdmin configurationAdmin,
+		UpdateHandler updateHandler)
+		throws ParameterResolutionException, IllegalArgumentException {
 
 		try {
 
@@ -108,30 +109,18 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 			if (isFactory(configurationAnnotation)) {
 				configBefore = ConfigAdminUtil.getConfigsByFactoryServicePid(configurationAdmin,
-					pid(configurationAnnotation), factoryName(configurationAnnotation));
+					pid(configurationAnnotation), factoryName(configurationAnnotation), 0l);
 			} else {
-				configBefore = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin, pid(configurationAnnotation));
+				configBefore = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin, pid(configurationAnnotation),
+					0l);
 			}
 			Configuration configuration = null;
 
-			switch (configurationAnnotation.action()) {
-
-				case GET_OR_CREATE :
-					if (isFactory(configurationAnnotation)) {
-						configuration = configurationAdmin.getFactoryConfiguration(pid(configurationAnnotation),
-							factoryName(configurationAnnotation));
-					} else {
-						configuration = configurationAdmin.getConfiguration(pid(configurationAnnotation));
-					}
-					break;
-				case CREATE :
-					if (isFactory(configurationAnnotation)) {
-						configuration = configurationAdmin.createFactoryConfiguration(pid(configurationAnnotation),
-							null);
-					} else {
-						// See IllegalArgumentException above
-					}
-					break;
+			if (isFactory(configurationAnnotation)) {
+				configuration = configurationAdmin.getFactoryConfiguration(pid(configurationAnnotation),
+					factoryName(configurationAnnotation));
+			} else {
+				configuration = configurationAdmin.getConfiguration(pid(configurationAnnotation));
 			}
 
 			if (configuration != null) {
@@ -139,10 +128,11 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 					// has relevant Properties to update
 					Map<String, ?> map = Stream.of(configurationAnnotation.properties())
 						.collect(Collectors.toMap((e) -> e.key(), (e) -> e.value()));
-					configuration.update(Dictionaries.asDictionary(map));
+
+					updateHandler.update(configuration, Dictionaries.asDictionary(map), 1000);
 				} else if (configBefore == null) {
 					// is new created Configuration. must be updated
-					configuration.update(Dictionaries.dictionaryOf());
+					updateHandler.update(configuration, Dictionaries.dictionaryOf(), 1000);
 				}
 			}
 		} catch (Exception e) {
@@ -218,9 +208,10 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 		Configuration configuration = null;
 		if (isFactory(injectConfiguration)) {
 			configuration = ConfigAdminUtil.getConfigsByFactoryServicePid(configurationAdmin, pid(injectConfiguration),
-				factoryName(injectConfiguration));
+				factoryName(injectConfiguration), injectConfiguration.timeout());
 		} else {
-			configuration = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin, pid(injectConfiguration));
+			configuration = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin, pid(injectConfiguration),
+				injectConfiguration.timeout());
 		}
 
 		if (memberType.equals(Configuration.class)) {
@@ -267,6 +258,11 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 		bundleContext = FrameworkUtil.getBundle(extensionContext.getRequiredTestClass())
 			.getBundleContext();
 
+		if (registrationTimeoutListener == null) {
+			timeoutListener = new UpdateHandler();
+			registrationTimeoutListener = bundleContext.registerService(ConfigurationListener.class, timeoutListener,
+				null);
+		}
 		try {
 			sref = bundleContext.getServiceReference(ConfigurationAdmin.class);
 			if (sref == null) {
@@ -300,12 +296,12 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 				if (configAnnotations != null) {
 					Stream.of(configAnnotations.value())
 						.forEachOrdered((configAnnotation) -> {
-								handleWithConfiguration(configAnnotation, getConfigAdmin());
+								handleWithConfiguration(configAnnotation, getConfigAdmin(), timeoutListener);
 						});
 				}
 				WithConfiguration configAnnotation = element.getAnnotation(WithConfiguration.class);
 				if (configAnnotation != null) {
-						handleWithConfiguration(configAnnotation, getConfigAdmin());
+						handleWithConfiguration(configAnnotation, getConfigAdmin(), timeoutListener);
 				}
 			});
 	}
@@ -321,6 +317,10 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 		reset(extensionContext);
 
+		if (registrationTimeoutListener != null) {
+			registrationTimeoutListener.unregister();
+			registrationTimeoutListener = null;
+		}
 		if (bundleContext != null && sref != null) {
 			bundleContext.ungetService(sref);
 		}
@@ -328,7 +328,7 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 	private void reset(ExtensionContext extensionContext) throws Exception {
 		List<ConfigurationCopy> copys = getStore(extensionContext).get(STORE_CONFIGURATION_KEY, List.class);
-		ConfigAdminUtil.resetConfig(getConfigAdmin(), copys);
+		ConfigAdminUtil.resetConfig(timeoutListener, getConfigAdmin(), copys);
 		getStore(extensionContext).remove(STORE_CONFIGURATION_KEY, List.class);
 	}
 

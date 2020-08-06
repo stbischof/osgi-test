@@ -40,6 +40,7 @@ import java.lang.annotation.Target;
 
 public @interface InjectConfiguration {
 
+	static long DEFAULT_TIMEOUT = 200l;
 
 	/**
 	 * The pid of the Configuration.<br>
@@ -53,4 +54,10 @@ public @interface InjectConfiguration {
 	 */
 	String value();
 
+	/**
+	 * Indicate require Configuration must arrive within the specified timeout.
+	 *
+	 * @return The timeout.
+	 */
+	long timeout() default DEFAULT_TIMEOUT;
 }
