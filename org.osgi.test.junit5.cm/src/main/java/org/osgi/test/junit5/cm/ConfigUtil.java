@@ -20,6 +20,9 @@ import java.io.UncheckedIOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -29,8 +32,10 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.test.common.annotation.config.ConfigEntry;
+import org.osgi.test.common.annotation.config.ConfigEntry.Type;
 
-public class ConfigAdminUtil {
+public class ConfigUtil {
 
 	public static Configuration getConfigsByServicePid(ConfigurationAdmin ca, String pid) throws Exception {
 		return getConfigsByServicePid(ca, pid, 0l);
@@ -85,7 +90,7 @@ public class ConfigAdminUtil {
 		throws Exception {
 
 		List<ConfigurationCopy> leftOvers = new ArrayList<ConfigurationCopy>(copys);
-		List<Configuration> configurations = ConfigAdminUtil.getAllConfigurations(ca);
+		List<Configuration> configurations = ConfigUtil.getAllConfigurations(ca);
 
 		configurations.stream()
 			.forEach((conf) -> {
@@ -145,6 +150,96 @@ public class ConfigAdminUtil {
 			});
 
 			// TODO: wait for async activating/deactivating of Services
+		}
+
+		public static <K, V> Dictionary<K, V> copy(Dictionary<K, V> dictionary) {
+			Hashtable<K, V> copy = new Hashtable<>();
+			Enumeration<K> keys = dictionary.keys();
+			while (keys.hasMoreElements()) {
+				K key = keys.nextElement();
+				copy.put(key, dictionary.get(key));
+			}
+			return copy;
+		}
+
+		public static Dictionary<String, Object> of(ConfigEntry[] entrys) {
+			Hashtable<String, Object> dictionary = new Hashtable<>();
+			for (ConfigEntry entry : entrys) {
+				dictionary.put(entry.key(), toValue(entry));
+			}
+			return dictionary;
+		}
+
+		private static Object toValue(ConfigEntry entry) {
+			List<Object> list = new ArrayList<Object>();
+			boolean primitive = entry.primitive();
+			for (String v : entry.value()) {
+				Object val = null;
+
+				if (v != null) {
+					switch (entry.scalar()) {
+						case Boolean :
+							Boolean booleanValue = Boolean.valueOf(v);
+							val = primitive ? booleanValue.booleanValue() : booleanValue;
+							break;
+
+						case Byte :
+							Byte byteVal = Byte.valueOf(v);
+							val = primitive ? byteVal.byteValue() : byteVal;
+							break;
+
+						case Character :
+							char charVal = v.charAt(0);
+							val = primitive ? charVal : new Character(charVal);
+							break;
+
+						case Double :
+							Double doubleVal = Double.valueOf(v);
+							val = primitive ? doubleVal.doubleValue() : doubleVal;
+							break;
+
+						case Float :
+							Float floatVal = Float.valueOf(v);
+							val = primitive ? floatVal.floatValue() : floatVal;
+							break;
+
+						case Integer :
+							Integer integerVal = Integer.valueOf(v);
+							val = primitive ? integerVal.intValue() : integerVal;
+							break;
+
+						case Long :
+							Long longVal = Long.valueOf(v);
+							val = primitive ? longVal.longValue() : longVal;
+							break;
+
+						case Short :
+							Short shortVal = Short.valueOf(v);
+							val = primitive ? shortVal.shortValue() : shortVal;
+							break;
+
+						case String :
+							val = v;
+							break;
+					}
+				}
+
+				if (Type.Scalar.equals(entry.type())) {
+					return val;
+				} else {
+					list.add(val);
+				}
+			}
+
+			if (entry.type()
+				.equals(Type.Array)) {
+				return list.toArray();
+			} else if (entry.type()
+				.equals(Type.Collection)) {
+				return list;
+			}
+
+			return null;
 		}
 
 }

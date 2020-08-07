@@ -79,7 +79,7 @@ public class ConfigAnnotationTest {
 	@Test
 	public void testFieldConfiguration() throws Exception {
 
-		Configuration cs = ConfigAdminUtil.getConfigsByServicePid(ca, NONSTATIC_CONFIGURATION_PID);
+		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, NONSTATIC_CONFIGURATION_PID);
 
 		assertThat(cs).isEqualTo(nonStaticConfiguration);
 
@@ -95,7 +95,7 @@ public class ConfigAnnotationTest {
 		@InjectConfiguration(PARAM_PID) Configuration configuration)
 		throws Exception {
 
-		Configuration cs = ConfigAdminUtil.getConfigsByServicePid(ca, PARAM_PID);
+		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, PARAM_PID);
 		assertThat(cs).isEqualTo(configuration);
 
 		assertNull(configuration.getProperties()
@@ -114,7 +114,7 @@ public class ConfigAnnotationTest {
 		@InjectConfiguration(PARAM_PID) Configuration configuration)
 		throws Exception {
 
-		Configuration cs = ConfigAdminUtil.getConfigsByServicePid(ca, PARAM_PID);
+		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, PARAM_PID);
 		assertThat(cs).isEqualTo(configuration);
 
 		assertNull(configuration.getProperties()
@@ -130,7 +130,7 @@ public class ConfigAnnotationTest {
 		@InjectConfiguration(PARAM_PID) Configuration configuration)
 		throws Exception {
 
-		Configuration cs = ConfigAdminUtil.getConfigsByServicePid(ca, PARAM_PID);
+		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, PARAM_PID);
 
 		assertNull(configuration.getProperties()
 			.get("foo"));
@@ -146,7 +146,7 @@ public class ConfigAnnotationTest {
 	})
 	public void testMethodConfiguration() throws Exception {
 
-		Configuration cs = ConfigAdminUtil.getConfigsByServicePid(ca, METHOD_PID);
+		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, METHOD_PID);
 		assertThat(cs).isNotNull();
 		assertEquals("bar", cs.getProperties()
 			.get("foo"));
@@ -158,7 +158,7 @@ public class ConfigAnnotationTest {
 	})
 	public void testMethodConfigurationFactory() throws Exception {
 
-		Configuration cs = ConfigAdminUtil.getConfigsByServicePid(ca, FACTORY_CONFIGURATION_PID + "~factory.name");
+		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, FACTORY_CONFIGURATION_PID + "~factory.name");
 		assertThat(cs).isNotNull();
 
 		assertEquals("bar", cs.getProperties()
@@ -172,7 +172,7 @@ public class ConfigAnnotationTest {
 	})
 	public void testMethodConfigurationFactoryCreate() throws Exception {
 
-		Configuration cs = ConfigAdminUtil.getConfigsByServicePid(ca, FACTORY_CONFIGURATION_PID + "~factory.name2");
+		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, FACTORY_CONFIGURATION_PID + "~factory.name2");
 		assertThat(cs).isNotNull();
 
 		assertEquals("bar", cs.getProperties()

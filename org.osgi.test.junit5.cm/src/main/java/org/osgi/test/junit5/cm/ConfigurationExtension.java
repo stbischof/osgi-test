@@ -77,7 +77,7 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 			Class<?> memberType = field.getType();
 			Type genericMemberType = field.getGenericType();
 
-			Configuration ic = ConfigAdminUtil.getConfigsByServicePid(getConfigAdmin(), injectConfiguration.value(),
+			Configuration ic = ConfigUtil.getConfigsByServicePid(getConfigAdmin(), injectConfiguration.value(),
 				injectConfiguration.timeout());
 
 			Object objectToInject = getInjectConfiguration(memberType, genericMemberType, getConfigAdmin(), ic);
@@ -91,8 +91,8 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 	private void storeConfig(ExtensionContext extensionContext) throws Exception {
 
-		List<Configuration> configurations = ConfigAdminUtil.getAllConfigurations(getConfigAdmin());
-		List<ConfigurationCopy> configurationCopies = ConfigAdminUtil.cloneConfigurations(configurations);
+		List<Configuration> configurations = ConfigUtil.getAllConfigurations(getConfigAdmin());
+		List<ConfigurationCopy> configurationCopies = ConfigUtil.cloneConfigurations(configurations);
 
 		extensionContext.getStore(Namespace.create(ConfigurationExtension.class, extensionContext.getUniqueId()))
 			.put(STORE_CONFIGURATION_KEY, configurationCopies);
@@ -104,13 +104,12 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 		throws ParameterResolutionException, IllegalArgumentException {
 
 		try {
-			Configuration configBefore = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin,
-				configAnnotation.pid(), 0l);
+			Configuration configBefore = ConfigUtil.getConfigsByServicePid(configurationAdmin, configAnnotation.pid(),
+				0l);
 
 			Configuration configuration = configurationAdmin.getConfiguration(configAnnotation.pid());
 
-			updateHandler.checkOldAndUpdate(configBefore, configuration,
-				Dictionaries.of(configAnnotation.properties()));
+			updateHandler.checkOldAndUpdate(configBefore, configuration, ConfigUtil.of(configAnnotation.properties()));
 
 			return configuration;
 
@@ -126,14 +125,13 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 		try {
 
-			Configuration configBefore = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin,
+			Configuration configBefore = ConfigUtil.getConfigsByServicePid(configurationAdmin,
 				configAnnotation.factoryPid() + "~" + configAnnotation.name());
 
 			Configuration configuration = configurationAdmin.getFactoryConfiguration(configAnnotation.factoryPid(),
 				configAnnotation.name());
 
-			updateHandler.checkOldAndUpdate(configBefore, configuration,
-				Dictionaries.of(configAnnotation.properties()));
+			updateHandler.checkOldAndUpdate(configBefore, configuration, ConfigUtil.of(configAnnotation.properties()));
 
 			return configuration;
 
@@ -186,24 +184,42 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 				InjectConfiguration ic = injectConfiguration.get();
 
 				Configuration configuration = null;
+				boolean valueUsed = false;
+				boolean withConfigUsed = false;
+				boolean withFactoryConfigUsed = false;
 				if (!ic.value()
 					.equals(WithConfiguration.NOT_SET)) {
 
-					configuration = ConfigAdminUtil.getConfigsByServicePid(getConfigAdmin(), ic.value(), ic.timeout());
+					configuration = ConfigUtil.getConfigsByServicePid(getConfigAdmin(), ic.value(), ic.timeout());
 
+					valueUsed = true;
 				} else if (!ic.withConfig()
 					.pid()
 					.equals(WithConfiguration.NOT_SET)) {
 
+					if (valueUsed) {
+						throw new IllegalArgumentException(
+							"@InjectConfiguration - only one of the Fields `value`, `withConfig` or `withFactoryConfig` could be used.");
+					}
 					WithConfiguration wc = ic.withConfig();
 					configuration = handleWithConfiguration(wc, getConfigAdmin(), updateHandler);
+					withConfigUsed = true;
 				} else if (!ic.withFactoryConfig()
 					.factoryPid()
 					.equals(WithConfiguration.NOT_SET)) {
 
+					if (valueUsed || withConfigUsed) {
+						throw new IllegalArgumentException(
+							"@InjectConfiguration - only one of the Fields `value`, `withConfig` or `withFactoryConfig` could be used.");
+					}
+
 					WithFactoryConfiguration wc = ic.withFactoryConfig();
 					configuration = handleWithFactoryConfiguration(wc, getConfigAdmin(), updateHandler);
-
+					withFactoryConfigUsed = true;
+				}
+				if (!valueUsed && !withConfigUsed && !withConfigUsed) {
+					throw new IllegalArgumentException(
+						"@InjectConfiguration - one of the Fields `value`, `withConfig` or `withFactoryConfig` must be used.");
 				}
 				return getInjectConfiguration(memberType, genericMemberType, getConfigAdmin(), configuration);
 			}
@@ -342,7 +358,7 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 	private void reset(ExtensionContext extensionContext) throws Exception {
 		List<ConfigurationCopy> copys = getStore(extensionContext).get(STORE_CONFIGURATION_KEY, List.class);
-		ConfigAdminUtil.resetConfig(updateHandler, getConfigAdmin(), copys);
+		ConfigUtil.resetConfig(updateHandler, getConfigAdmin(), copys);
 		getStore(extensionContext).remove(STORE_CONFIGURATION_KEY, List.class);
 	}
 

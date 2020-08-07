@@ -26,9 +26,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /*
- * Reads existing a Configuration from the Config-Admin
- * Inject the `org.osgi.service.cm.Configuration` (if used on a Parameter or Field) for further updates or delete of the `org.osgi.service.cm.Configuration`
+ * Reads existing a Configuration from the Config-Admin and injects it into Field or Parameter
+ * Inject the `org.osgi.service.cm.Configuration`, `Map`, `Dictionary` or an `Optional<Condiguration>`.
  *
+ * Only one of the Fields `value`, `withConfig` or `withFactoryConfig` could be used.
  */
 @Inherited
 @Target({

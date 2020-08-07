@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,9 +35,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import org.osgi.test.common.annotation.config.ConfigEntry;
-import org.osgi.test.common.annotation.config.ConfigEntry.Type;
-import org.osgi.test.common.annotation.config.WithConfiguration;
 import org.osgi.test.common.stream.MapStream;
 
 public class Dictionaries {
@@ -443,92 +439,6 @@ public class Dictionaries {
 	public static <K, V> Dictionary<K, V> dictionaryOf(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
 		return MapStream.of(k1, v1, k2, v2, k3, v3, k4, v4)
 			.collect(toDictionary());
-	}
-
-	public static <K, V> Dictionary<K, V> copy(Dictionary<K, V> dictionary) {
-		Hashtable<K, V> copy = new Hashtable<>();
-		copy.putAll(asMap(dictionary));
-		return copy;
-	}
-
-	public static Dictionary<String, Object> of(ConfigEntry[] entrys) {
-		Hashtable<String, Object> dictionary = new Hashtable<>();
-		for (ConfigEntry entry : entrys) {
-				dictionary.put(entry.key(), toValue(entry));
-		}
-		return dictionary;
-	}
-
-	private static Object toValue(ConfigEntry entry) {
-		List<Object> list = new ArrayList<Object>();
-		boolean primitive = entry.primitive();
-		for (String v : entry.value()) {
-			Object val = null;
-
-			if (v != null) {
-			switch (entry.scalar()) {
-				case Boolean :
-					Boolean booleanValue = Boolean.valueOf(v);
-					val = primitive ? booleanValue.booleanValue() : booleanValue;
-					break;
-
-				case Byte :
-					Byte byteVal = Byte.valueOf(v);
-					val = primitive ? byteVal.byteValue() : byteVal;
-					break;
-
-				case Character :
-					char charVal = v.charAt(0);
-					val = primitive ? charVal : new Character(charVal);
-					break;
-
-				case Double :
-					Double doubleVal = Double.valueOf(v);
-					val = primitive ? doubleVal.doubleValue() : doubleVal;
-					break;
-
-				case Float :
-					Float floatVal = Float.valueOf(v);
-					val = primitive ? floatVal.floatValue() : floatVal;
-					break;
-
-				case Integer :
-					Integer integerVal = Integer.valueOf(v);
-					val = primitive ? integerVal.intValue() : integerVal;
-					break;
-
-				case Long :
-					Long longVal = Long.valueOf(v);
-					val = primitive ? longVal.longValue() : longVal;
-					break;
-
-				case Short :
-					Short shortVal = Short.valueOf(v);
-					val = primitive ? shortVal.shortValue() : shortVal;
-					break;
-
-				case String :
-					val = v;
-					break;
-			}
-		}
-
-			if (Type.Scalar.equals(entry.type())) {
-				return val;
-			} else {
-				list.add(val);
-			}
-		}
-
-		if (entry.type()
-			.equals(Type.Array)) {
-			return list.toArray();
-		} else if (entry.type()
-			.equals(Type.Collection)) {
-			return list;
-		}
-
-		return null;
 	}
 
 	private static <K, V> Collector<? super Map.Entry<? extends K, ? extends V>, ?, Dictionary<K, V>> toDictionary() {
