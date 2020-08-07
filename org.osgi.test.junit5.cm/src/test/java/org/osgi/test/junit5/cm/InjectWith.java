@@ -17,26 +17,64 @@ package org.osgi.test.junit5.cm;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.service.cm.Configuration;
 import org.osgi.test.common.annotation.config.ConfigEntry;
+import org.osgi.test.common.annotation.config.ConfigEntry.Scalar;
 import org.osgi.test.common.annotation.config.ConfigEntry.Type;
 import org.osgi.test.common.annotation.config.InjectConfiguration;
 import org.osgi.test.common.annotation.config.WithConfiguration;
 import org.osgi.test.common.annotation.config.WithFactoryConfiguration;
+import org.osgi.test.common.dictionary.Dictionaries;
 
 @ExtendWith(ConfigurationExtension.class)
 public class InjectWith {
 
 	@Test
 	public void test1(@InjectConfiguration(withConfig = @WithConfiguration(pid = "pid", properties = {//
-		@ConfigEntry(key = "key1", value = "val1"), //
-		@ConfigEntry(key = "key2", value = {
+		@ConfigEntry(key = "Scalar", type = Type.Scalar, scalar = Scalar.Integer, value = "1"), //
+		@ConfigEntry(key = "PrimitiveArray", type = Type.PrimitiveArray, scalar = Scalar.Integer, value = {
 			"1", "2"
-		}, type = Type.Collection, primitive = true)//
+		}), //
+		@ConfigEntry(key = "Array", type = Type.Array, scalar = Scalar.Integer, value = {
+			"1", "2"
+		}), //
+		@ConfigEntry(key = "Collection", type = Type.Collection, scalar = Scalar.Integer, value = {
+			"1", "2"
+		})//
 	})) Configuration c) throws Exception {
 		assertNotNull(c);
+		Map<String, Object> props = Dictionaries.asMap(c.getProperties());
+		Assertions.assertThat(props)
+			.extracting("PrimitiveArray")
+			.isInstanceOf(int[].class)
+			.isEqualTo(new int[] {
+				1, 2
+			});
+
+		Assertions.assertThat(props)
+			.extracting("Array")
+			.isInstanceOf(Integer[].class)
+			.isEqualTo(new Integer[] {
+				1, 2
+			});
+
+		Assertions.assertThat(props)
+			.extracting("Collection")
+			.isInstanceOf(Collection.class)
+			.isEqualTo(Arrays.asList(1, 2));
+
+		Assertions.assertThat(props)
+			.extracting("Scalar")
+			.isInstanceOf(Integer.class)
+			.isEqualTo(1);
+
 	}
 
 	@Test

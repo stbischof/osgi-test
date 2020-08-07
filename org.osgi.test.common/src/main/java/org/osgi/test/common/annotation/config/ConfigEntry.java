@@ -47,7 +47,9 @@ public @interface ConfigEntry {
 	public enum Type {
 		Scalar,
 		Collection,
-		Array
+		Array,
+
+		PrimitiveArray
 	}
 
 	String key();
@@ -57,7 +59,5 @@ public @interface ConfigEntry {
 	Scalar scalar() default Scalar.String;
 
 	Type type() default Type.Scalar;
-
-	boolean primitive() default false;
 
 }

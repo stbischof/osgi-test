@@ -17,8 +17,10 @@ package org.osgi.test.junit5.cm;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Array;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -33,6 +35,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.test.common.annotation.config.ConfigEntry;
+import org.osgi.test.common.annotation.config.ConfigEntry.Scalar;
 import org.osgi.test.common.annotation.config.ConfigEntry.Type;
 
 public class ConfigUtil {
@@ -171,8 +174,11 @@ public class ConfigUtil {
 		}
 
 		private static Object toValue(ConfigEntry entry) {
-			List<Object> list = new ArrayList<Object>();
-			boolean primitive = entry.primitive();
+
+			boolean primitive = entry.type()
+				.equals(Type.PrimitiveArray);
+			Object array = createArray(entry.scalar(), primitive, entry.value().length);
+			int i = 0;
 			for (String v : entry.value()) {
 				Object val = null;
 
@@ -227,18 +233,90 @@ public class ConfigUtil {
 				if (Type.Scalar.equals(entry.type())) {
 					return val;
 				} else {
-					list.add(val);
+					Array.set(array, i++, val);
 				}
 			}
-
 			if (entry.type()
-				.equals(Type.Array)) {
-				return list.toArray();
+				.equals(Type.Array)
+				|| entry.type()
+					.equals(Type.PrimitiveArray)) {
+				return array;
 			} else if (entry.type()
 				.equals(Type.Collection)) {
-				return list;
+
+				return Arrays.asList((Object[]) array);
 			}
 
+			return null;
+		}
+
+		private static Object createArray(Scalar scalar, boolean primitive, int length) {
+
+			switch (scalar) {
+				case Boolean :
+					if (primitive) {
+						return new boolean[length];
+					} else {
+						return new Boolean[length];
+					}
+
+				case Byte :
+					if (primitive) {
+						return new byte[length];
+					} else {
+						return new Byte[length];
+					}
+
+				case Character :
+					if (primitive) {
+						return new char[length];
+					} else {
+						return new Character[length];
+					}
+
+				case Double :
+					if (primitive) {
+						return new double[length];
+					} else {
+						return new Double[length];
+					}
+
+				case Float :
+					if (primitive) {
+						return new int[length];
+					} else {
+						return new Float[length];
+					}
+
+				case Integer :
+					if (primitive) {
+						return new int[length];
+					} else {
+						return new Integer[length];
+					}
+
+				case Long :
+					if (primitive) {
+						return new long[length];
+					} else {
+						return new Long[length];
+					}
+
+				case Short :
+					if (primitive) {
+						return new short[length];
+					} else {
+						return new Short[length];
+					}
+
+				case String :
+					if (primitive) {
+						throw new IllegalArgumentException(
+							"@ConfigEntry Could not be Scalar=String and type=ÜrimitiveArray at the same time");
+					} else {
+						return new String[length];
+					}
+			}
 			return null;
 		}
 
