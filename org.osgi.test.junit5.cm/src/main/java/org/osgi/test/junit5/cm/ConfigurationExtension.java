@@ -217,7 +217,7 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 					configuration = handleWithFactoryConfiguration(wc, getConfigAdmin(), updateHandler);
 					withFactoryConfigUsed = true;
 				}
-				if (!valueUsed && !withConfigUsed && !withConfigUsed) {
+				if (!valueUsed && !withConfigUsed && !withFactoryConfigUsed) {
 					throw new IllegalArgumentException(
 						"@InjectConfiguration - one of the Fields `value`, `withConfig` or `withFactoryConfig` must be used.");
 				}
