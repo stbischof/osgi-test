@@ -43,16 +43,25 @@ public @interface InjectConfiguration {
 	static long DEFAULT_TIMEOUT = 200l;
 
 	/**
-	 * The pid of the Configuration.<br>
-	 * <br>
-	 * <ul>
-	 * <li><code>pid</code> - a service not a factory
-	 * <li><code>pid~factoryName</code> - a factory with given factoryName
-	 * </ul>
+	 * The pid of the Configuration.
 	 *
 	 * @return The pid
 	 */
-	String value();
+	String value() default WithConfiguration.NOT_SET;
+
+	/**
+	 * The Configuration that would be created/updated before injection.
+	 *
+	 * @return The withConfiguration
+	 */
+	WithConfiguration withConfig() default @WithConfiguration(pid = WithConfiguration.NOT_SET);
+
+	/**
+	 * The FactoryConfiguration that would be created/updated before injection.
+	 *
+	 * @return The withFactoryConfiguration
+	 */
+	WithFactoryConfiguration withFactoryConfig() default @WithFactoryConfiguration(factoryPid = WithConfiguration.NOT_SET, name = WithConfiguration.NOT_SET);
 
 	/**
 	 * Indicate require Configuration must arrive within the specified timeout.

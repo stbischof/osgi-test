@@ -18,7 +18,7 @@ public class UpdateHandler implements ConfigurationListener {
 	private Map<String, CountDownLatch>	updateMap	= new HashMap<String, CountDownLatch>();
 	private Map<String, CountDownLatch>	deleteMap	= new HashMap<String, CountDownLatch>();
 
-	boolean update(Configuration configuration, Dictionary<String, Object> dictionary, long timeout)
+	public boolean update(Configuration configuration, Dictionary<String, Object> dictionary, long timeout)
 		throws InterruptedException, IOException {
 		String pid = configuration.getPid();
 		CountDownLatch latch = createCountdownLatchUpdate(configuration.getPid());
@@ -27,7 +27,7 @@ public class UpdateHandler implements ConfigurationListener {
 		return ok;
 	}
 
-	boolean delete(Configuration configuration, long timeout) throws InterruptedException, IOException {
+	public boolean delete(Configuration configuration, long timeout) throws InterruptedException, IOException {
 		String pid = configuration.getPid();
 		CountDownLatch latch = createCountdownLatchDelete(configuration.getPid());
 		configuration.delete();
@@ -73,7 +73,7 @@ public class UpdateHandler implements ConfigurationListener {
 		}
 	}
 
-	public void extracted(Configuration configBefore, Configuration configuration,
+	public void checkOldAndUpdate(Configuration configBefore, Configuration configuration,
 		Dictionary<String, Object> dictionary) throws InterruptedException, IOException {
 		if (configuration != null) {
 			if (dictionary != null && !notSet(dictionary)) {

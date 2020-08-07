@@ -61,7 +61,7 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 	private BundleContext								bundleContext			= null;
 	private ServiceReference<ConfigurationAdmin>		sref					= null;
 	private ServiceRegistration<ConfigurationListener>	registrationTimeoutListener;
-	private UpdateHandler								timeoutListener;
+	private UpdateHandler								updateHandler;
 
 	@Override
 	public void beforeEach(ExtensionContext extensionContext) throws Exception {
@@ -73,12 +73,16 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 			assertValidFieldCandidate(field);
 
-			InjectConfiguration configAnnotation = field.getAnnotation(InjectConfiguration.class);
+			InjectConfiguration injectConfiguration = field.getAnnotation(InjectConfiguration.class);
 			Class<?> memberType = field.getType();
 			Type genericMemberType = field.getGenericType();
 
-			setField(field, extensionContext.getRequiredTestInstance(),
-				getInjectConfiguration(memberType, genericMemberType, configAnnotation, getConfigAdmin()));
+			Configuration ic = ConfigAdminUtil.getConfigsByServicePid(getConfigAdmin(), injectConfiguration.value(),
+				injectConfiguration.timeout());
+
+			Object objectToInject = getInjectConfiguration(memberType, genericMemberType, getConfigAdmin(), ic);
+
+			setField(field, extensionContext.getRequiredTestInstance(), objectToInject);
 
 		}
 		handleElementAnnotation(extensionContext);
@@ -95,8 +99,9 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 	}
 
-	static void handleWithConfiguration(WithConfiguration configAnnotation, ConfigurationAdmin configurationAdmin,
-		UpdateHandler updateHandler) throws ParameterResolutionException, IllegalArgumentException {
+	static Configuration handleWithConfiguration(WithConfiguration configAnnotation,
+		ConfigurationAdmin configurationAdmin, UpdateHandler updateHandler)
+		throws ParameterResolutionException, IllegalArgumentException {
 
 		try {
 			Configuration configBefore = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin,
@@ -104,7 +109,10 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 			Configuration configuration = configurationAdmin.getConfiguration(configAnnotation.pid());
 
-			updateHandler.extracted(configBefore, configuration, Dictionaries.of(configAnnotation.properties()));
+			updateHandler.checkOldAndUpdate(configBefore, configuration,
+				Dictionaries.of(configAnnotation.properties()));
+
+			return configuration;
 
 		} catch (Exception e) {
 			throw new ParameterResolutionException("ConfigurationAdmin could not be found", e);
@@ -112,7 +120,7 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 	}
 
-	static void handleWithFactoryConfiguration(WithFactoryConfiguration configAnnotation,
+	static Configuration handleWithFactoryConfiguration(WithFactoryConfiguration configAnnotation,
 		ConfigurationAdmin configurationAdmin, UpdateHandler updateHandler)
 		throws ParameterResolutionException, IllegalArgumentException {
 
@@ -124,7 +132,11 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 			Configuration configuration = configurationAdmin.getFactoryConfiguration(configAnnotation.factoryPid(),
 				configAnnotation.name());
 
-			updateHandler.extracted(configBefore, configuration, Dictionaries.of(configAnnotation.properties()));
+			updateHandler.checkOldAndUpdate(configBefore, configuration,
+				Dictionaries.of(configAnnotation.properties()));
+
+			return configuration;
+
 		} catch (Exception e) {
 			throw new ParameterResolutionException("ConfigurationAdmin could not be found", e);
 		}
@@ -168,8 +180,34 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 				}
 
 			}
-			return getInjectConfiguration(memberType, genericMemberType, injectConfiguration.get(), getConfigAdmin());
 
+			if (injectConfiguration.isPresent()) {
+
+				InjectConfiguration ic = injectConfiguration.get();
+
+				Configuration configuration = null;
+				if (!ic.value()
+					.equals(WithConfiguration.NOT_SET)) {
+
+					configuration = ConfigAdminUtil.getConfigsByServicePid(getConfigAdmin(), ic.value(), ic.timeout());
+
+				} else if (!ic.withConfig()
+					.pid()
+					.equals(WithConfiguration.NOT_SET)) {
+
+					WithConfiguration wc = ic.withConfig();
+					configuration = handleWithConfiguration(wc, getConfigAdmin(), updateHandler);
+				} else if (!ic.withFactoryConfig()
+					.factoryPid()
+					.equals(WithConfiguration.NOT_SET)) {
+
+					WithFactoryConfiguration wc = ic.withFactoryConfig();
+					configuration = handleWithFactoryConfiguration(wc, getConfigAdmin(), updateHandler);
+
+				}
+				return getInjectConfiguration(memberType, genericMemberType, getConfigAdmin(), configuration);
+			}
+			return null;
 		} catch (Exception e) {
 
 			throw new ParameterResolutionException("Could not get Configuration from Configuration-Admin", e);
@@ -177,12 +215,7 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 	}
 
 	private Object getInjectConfiguration(Class<?> memberType, Type genericMemberType,
-		InjectConfiguration injectConfiguration, ConfigurationAdmin configurationAdmin) throws Exception {
-
-		Configuration configuration = null;
-
-		configuration = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin, injectConfiguration.value(),
-			injectConfiguration.timeout());
+		ConfigurationAdmin configurationAdmin, Configuration configuration) throws Exception {
 
 		if (memberType.equals(Configuration.class)) {
 			return configuration;
@@ -226,8 +259,8 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 			.getBundleContext();
 
 		if (registrationTimeoutListener == null) {
-			timeoutListener = new UpdateHandler();
-			registrationTimeoutListener = bundleContext.registerService(ConfigurationListener.class, timeoutListener,
+			updateHandler = new UpdateHandler();
+			registrationTimeoutListener = bundleContext.registerService(ConfigurationListener.class, updateHandler,
 				null);
 		}
 		try {
@@ -263,12 +296,12 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 				if (configAnnotations != null) {
 					Stream.of(configAnnotations.value())
 						.forEachOrdered((configAnnotation) -> {
-							handleWithConfiguration(configAnnotation, getConfigAdmin(), timeoutListener);
+							handleWithConfiguration(configAnnotation, getConfigAdmin(), updateHandler);
 						});
 				}
 				WithConfiguration configAnnotation = element.getAnnotation(WithConfiguration.class);
 				if (configAnnotation != null) {
-					handleWithConfiguration(configAnnotation, getConfigAdmin(), timeoutListener);
+					handleWithConfiguration(configAnnotation, getConfigAdmin(), updateHandler);
 				}
 
 				WithFactoryConfigurations factoryConfigAnnotations = element
@@ -276,13 +309,13 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 				if (factoryConfigAnnotations != null) {
 					Stream.of(factoryConfigAnnotations.value())
 						.forEachOrdered((factoryConfigAnnotation) -> {
-							handleWithFactoryConfiguration(factoryConfigAnnotation, getConfigAdmin(), timeoutListener);
+							handleWithFactoryConfiguration(factoryConfigAnnotation, getConfigAdmin(), updateHandler);
 						});
 				}
 				WithFactoryConfiguration factoryConfigAnnotation = element
 					.getAnnotation(WithFactoryConfiguration.class);
 				if (factoryConfigAnnotation != null) {
-					handleWithFactoryConfiguration(factoryConfigAnnotation, getConfigAdmin(), timeoutListener);
+					handleWithFactoryConfiguration(factoryConfigAnnotation, getConfigAdmin(), updateHandler);
 				}
 			});
 	}
@@ -309,7 +342,7 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 	private void reset(ExtensionContext extensionContext) throws Exception {
 		List<ConfigurationCopy> copys = getStore(extensionContext).get(STORE_CONFIGURATION_KEY, List.class);
-		ConfigAdminUtil.resetConfig(timeoutListener, getConfigAdmin(), copys);
+		ConfigAdminUtil.resetConfig(updateHandler, getConfigAdmin(), copys);
 		getStore(extensionContext).remove(STORE_CONFIGURATION_KEY, List.class);
 	}
 
