@@ -32,10 +32,32 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ConfigEntry {
 
+	public enum Scalar {
+		String,
+		Integer,
+		Long,
+		Float,
+		Double,
+		Byte,
+		Short,
+		Character,
+		Boolean
+	}
+
+	public enum Type {
+		Scalar,
+		Collection,
+		Array
+	}
+
 	String key();
 
-	String value() default "";
+	String[] value() default "";
 
-	String type() default "String";
+	Scalar scalar() default Scalar.String;
+
+	Type type() default Type.Scalar;
+
+	boolean primitive() default false;
 
 }

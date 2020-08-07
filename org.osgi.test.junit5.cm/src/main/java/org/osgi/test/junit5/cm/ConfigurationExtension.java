@@ -16,9 +16,6 @@
 
 package org.osgi.test.junit5.cm;
 
-import static org.osgi.test.common.annotation.config.WithConfigurationUtil.factoryName;
-import static org.osgi.test.common.annotation.config.WithConfigurationUtil.isFactory;
-import static org.osgi.test.common.annotation.config.WithConfigurationUtil.pid;
 import static org.osgi.test.common.inject.FieldInjector.findAnnotatedFields;
 import static org.osgi.test.common.inject.FieldInjector.setField;
 
@@ -31,7 +28,6 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
@@ -51,10 +47,11 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationListener;
-import org.osgi.test.common.annotation.config.ConfigEntry;
 import org.osgi.test.common.annotation.config.InjectConfiguration;
 import org.osgi.test.common.annotation.config.WithConfiguration;
 import org.osgi.test.common.annotation.config.WithConfigurations;
+import org.osgi.test.common.annotation.config.WithFactoryConfiguration;
+import org.osgi.test.common.annotation.config.WithFactoryConfigurations;
 import org.osgi.test.common.dictionary.Dictionaries;
 
 public class ConfigurationExtension implements BeforeEachCallback, ParameterResolver,
@@ -98,62 +95,40 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 
 	}
 
-	static void handleWithConfiguration(WithConfiguration configurationAnnotation,
-		ConfigurationAdmin configurationAdmin,
-		UpdateHandler updateHandler)
-		throws ParameterResolutionException, IllegalArgumentException {
+	static void handleWithConfiguration(WithConfiguration configAnnotation, ConfigurationAdmin configurationAdmin,
+		UpdateHandler updateHandler) throws ParameterResolutionException, IllegalArgumentException {
 
 		try {
+			Configuration configBefore = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin,
+				configAnnotation.pid(), 0l);
 
-			Configuration configBefore = null;
+			Configuration configuration = configurationAdmin.getConfiguration(configAnnotation.pid());
 
-			if (isFactory(configurationAnnotation)) {
-				configBefore = ConfigAdminUtil.getConfigsByFactoryServicePid(configurationAdmin,
-					pid(configurationAnnotation), factoryName(configurationAnnotation), 0l);
-			} else {
-				configBefore = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin, pid(configurationAnnotation),
-					0l);
-			}
-			Configuration configuration = null;
+			updateHandler.extracted(configBefore, configuration, Dictionaries.of(configAnnotation.properties()));
 
-			if (isFactory(configurationAnnotation)) {
-				configuration = configurationAdmin.getFactoryConfiguration(pid(configurationAnnotation),
-					factoryName(configurationAnnotation));
-			} else {
-				configuration = configurationAdmin.getConfiguration(pid(configurationAnnotation));
-			}
-
-			if (configuration != null) {
-				if (configurationAnnotation.properties() != null && !notSet(configurationAnnotation)) {
-					// has relevant Properties to update
-					Map<String, ?> map = Stream.of(configurationAnnotation.properties())
-						.collect(Collectors.toMap((e) -> e.key(), (e) -> e.value()));
-
-					updateHandler.update(configuration, Dictionaries.asDictionary(map), 1000);
-				} else if (configBefore == null) {
-					// is new created Configuration. must be updated
-					updateHandler.update(configuration, Dictionaries.dictionaryOf(), 1000);
-				}
-			}
 		} catch (Exception e) {
 			throw new ParameterResolutionException("ConfigurationAdmin could not be found", e);
 		}
 
 	}
 
-	private static boolean notSet(WithConfiguration configurationAnnotation) {
-		if (configurationAnnotation.properties().length == 1) {
-			ConfigEntry entry = configurationAnnotation.properties()[0];
-			if (entry.key()
-				.equals(WithConfiguration.NOT_SET)
-				&& entry.value()
-					.equals(WithConfiguration.NOT_SET)
-				&& entry.type()
-					.equals(WithConfiguration.NOT_SET)) {
-				return true;
-			}
+	static void handleWithFactoryConfiguration(WithFactoryConfiguration configAnnotation,
+		ConfigurationAdmin configurationAdmin, UpdateHandler updateHandler)
+		throws ParameterResolutionException, IllegalArgumentException {
+
+		try {
+
+			Configuration configBefore = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin,
+				configAnnotation.factoryPid() + "~" + configAnnotation.name());
+
+			Configuration configuration = configurationAdmin.getFactoryConfiguration(configAnnotation.factoryPid(),
+				configAnnotation.name());
+
+			updateHandler.extracted(configBefore, configuration, Dictionaries.of(configAnnotation.properties()));
+		} catch (Exception e) {
+			throw new ParameterResolutionException("ConfigurationAdmin could not be found", e);
 		}
-		return false;
+
 	}
 
 	static void assertValidFieldCandidate(Field field) {
@@ -181,8 +156,7 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 				.getType();
 
 			Type genericMemberType = null;
-			Type t = parameterContext
-				.getParameter()
+			Type t = parameterContext.getParameter()
 				.getParameterizedType();
 			if (t instanceof ParameterizedType) {
 				ParameterizedType pt = (ParameterizedType) t;
@@ -206,13 +180,9 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 		InjectConfiguration injectConfiguration, ConfigurationAdmin configurationAdmin) throws Exception {
 
 		Configuration configuration = null;
-		if (isFactory(injectConfiguration)) {
-			configuration = ConfigAdminUtil.getConfigsByFactoryServicePid(configurationAdmin, pid(injectConfiguration),
-				factoryName(injectConfiguration), injectConfiguration.timeout());
-		} else {
-			configuration = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin, pid(injectConfiguration),
-				injectConfiguration.timeout());
-		}
+
+		configuration = ConfigAdminUtil.getConfigsByServicePid(configurationAdmin, injectConfiguration.value(),
+			injectConfiguration.timeout());
 
 		if (memberType.equals(Configuration.class)) {
 			return configuration;
@@ -236,15 +206,12 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 			Parameter parameter = parameterContext.getParameter();
 			if (parameter.getType()
 				.isAssignableFrom(Configuration.class)
-				|| parameter
-					.getType()
+				|| parameter.getType()
 					.isAssignableFrom(Optional.class)
 					&& (((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments()[0]
-						.equals(
-							Configuration.class))
+						.equals(Configuration.class))
 				|| parameter.getType()
-					.isAssignableFrom(
-						Map.class)
+					.isAssignableFrom(Map.class)
 				|| parameter.getType()
 					.isAssignableFrom(Dictionary.class)) {
 				return true;
@@ -296,12 +263,26 @@ public class ConfigurationExtension implements BeforeEachCallback, ParameterReso
 				if (configAnnotations != null) {
 					Stream.of(configAnnotations.value())
 						.forEachOrdered((configAnnotation) -> {
-								handleWithConfiguration(configAnnotation, getConfigAdmin(), timeoutListener);
+							handleWithConfiguration(configAnnotation, getConfigAdmin(), timeoutListener);
 						});
 				}
 				WithConfiguration configAnnotation = element.getAnnotation(WithConfiguration.class);
 				if (configAnnotation != null) {
-						handleWithConfiguration(configAnnotation, getConfigAdmin(), timeoutListener);
+					handleWithConfiguration(configAnnotation, getConfigAdmin(), timeoutListener);
+				}
+
+				WithFactoryConfigurations factoryConfigAnnotations = element
+					.getAnnotation(WithFactoryConfigurations.class);
+				if (factoryConfigAnnotations != null) {
+					Stream.of(factoryConfigAnnotations.value())
+						.forEachOrdered((factoryConfigAnnotation) -> {
+							handleWithFactoryConfiguration(factoryConfigAnnotation, getConfigAdmin(), timeoutListener);
+						});
+				}
+				WithFactoryConfiguration factoryConfigAnnotation = element
+					.getAnnotation(WithFactoryConfiguration.class);
+				if (factoryConfigAnnotation != null) {
+					handleWithFactoryConfiguration(factoryConfigAnnotation, getConfigAdmin(), timeoutListener);
 				}
 			});
 	}

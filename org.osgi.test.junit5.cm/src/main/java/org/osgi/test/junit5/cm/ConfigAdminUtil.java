@@ -41,15 +41,6 @@ public class ConfigAdminUtil {
 		return getConfigsByPid(ca, Constants.SERVICE_PID, pid, timeout);
 	}
 
-	public static Configuration getConfigsByFactoryServicePid(ConfigurationAdmin ca, String pid, String name,
-		long timeout) throws Exception {
-		return getConfigsByPid(ca, Constants.SERVICE_PID, pid + "~" + name, timeout);
-	}
-
-	public static Configuration getConfigsByFactoryServicePid(ConfigurationAdmin ca, String pid, String name)
-		throws Exception {
-		return getConfigsByFactoryServicePid(ca, pid, name, 0l);
-	}
 
 	private static Configuration getConfigsByPid(ConfigurationAdmin ca, String pid_key, String value, long timeout)
 		throws Exception {

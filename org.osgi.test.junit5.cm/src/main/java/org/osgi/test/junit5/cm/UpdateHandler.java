@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationEvent;
 import org.osgi.service.cm.ConfigurationListener;
+import org.osgi.test.common.annotation.config.WithConfiguration;
+import org.osgi.test.common.dictionary.Dictionaries;
 
 public class UpdateHandler implements ConfigurationListener {
 
@@ -69,6 +71,30 @@ public class UpdateHandler implements ConfigurationListener {
 				countDownLatch.countDown();
 			}
 		}
+	}
+
+	public void extracted(Configuration configBefore, Configuration configuration,
+		Dictionary<String, Object> dictionary) throws InterruptedException, IOException {
+		if (configuration != null) {
+			if (dictionary != null && !notSet(dictionary)) {
+				// has relevant Properties to update
+				update(configuration, dictionary, 1000);
+			} else if (configBefore == null) {
+				// is new created Configuration. must be updated
+				update(configuration, Dictionaries.dictionaryOf(), 1000);
+			}
+		}
+	}
+
+	private static boolean notSet(Dictionary<String, Object> dictionary) {
+		if (dictionary.size() == 1) {
+			if (dictionary.keys()
+				.nextElement()
+				.equals(WithConfiguration.NOT_SET)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

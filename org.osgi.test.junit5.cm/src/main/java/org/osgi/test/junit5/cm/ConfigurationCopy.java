@@ -3,6 +3,7 @@ package org.osgi.test.junit5.cm;
 import java.util.Dictionary;
 
 import org.osgi.service.cm.Configuration;
+import org.osgi.test.common.dictionary.Dictionaries;
 
 public class ConfigurationCopy {
 
@@ -20,7 +21,7 @@ public class ConfigurationCopy {
 
 		ConfigurationCopy copy = new ConfigurationCopy();
 		copy.pid = configuration.getPid();
-		copy.properties = configuration.getProperties();
+		copy.properties = Dictionaries.copy(configuration.getProperties());
 		copy.factoryPid = configuration.getFactoryPid();
 		copy.bundleLocation = configuration.getBundleLocation();
 		copy.changeCount = configuration.getChangeCount();

@@ -31,6 +31,7 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.test.common.annotation.config.ConfigEntry;
 import org.osgi.test.common.annotation.config.InjectConfiguration;
 import org.osgi.test.common.annotation.config.WithConfiguration;
+import org.osgi.test.common.annotation.config.WithFactoryConfiguration;
 
 @ExtendWith(ConfigurationExtension.class)
 @WithConfiguration(pid = ConfigAnnotationTest.NONSTATIC_CONFIGURATION_PID)
@@ -157,7 +158,7 @@ public class ConfigAnnotationTest {
 	})
 	public void testMethodConfigurationFactory() throws Exception {
 
-		Configuration cs = ConfigAdminUtil.getConfigsByFactoryServicePid(ca, FACTORY_CONFIGURATION_PID, "factory.name");
+		Configuration cs = ConfigAdminUtil.getConfigsByServicePid(ca, FACTORY_CONFIGURATION_PID + "~factory.name");
 		assertThat(cs).isNotNull();
 
 		assertEquals("bar", cs.getProperties()
@@ -165,15 +166,13 @@ public class ConfigAnnotationTest {
 	}
 
 	@Test
-	@WithConfiguration(pid = FACTORY_CONFIGURATION_PID + "~" + "factory.name2", properties =
-
+	@WithFactoryConfiguration(factoryPid = FACTORY_CONFIGURATION_PID, name = "factory.name2", properties =
 	{
 		@ConfigEntry(key = "foo", value = "bar")
 	})
 	public void testMethodConfigurationFactoryCreate() throws Exception {
 
-		Configuration cs = ConfigAdminUtil.getConfigsByFactoryServicePid(ca, FACTORY_CONFIGURATION_PID,
-			"factory.name2");
+		Configuration cs = ConfigAdminUtil.getConfigsByServicePid(ca, FACTORY_CONFIGURATION_PID + "~factory.name2");
 		assertThat(cs).isNotNull();
 
 		assertEquals("bar", cs.getProperties()

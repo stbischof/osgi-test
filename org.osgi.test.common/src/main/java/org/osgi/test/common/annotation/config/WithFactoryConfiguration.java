@@ -35,21 +35,27 @@ import java.lang.annotation.Target;
 @Target({
 	TYPE, METHOD
 })
-@Repeatable(WithConfigurations.class)
+@Repeatable(WithFactoryConfigurations.class)
 @Retention(RUNTIME)
 @Documented
 
-public @interface WithConfiguration {
+public @interface WithFactoryConfiguration {
 
 	public static final String NOT_SET = "org.osgi.test.common.annotation.config.notset";
 
 	/**
-	 * The pid of the Configuration.<br>
+	 * The factoryPid of the Configuration.<br>
 	 *
-	 * @return The pid
+	 * @return The factoryPid
 	 */
-	String pid();
+	String factoryPid();
 
+	/**
+	 * The name of the Configuration.<br>
+	 *
+	 * @return The name
+	 */
+	String name();
 
 	/**
 	 * Indicate the properties, that will be updated (if set) after selecting a
