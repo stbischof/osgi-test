@@ -16,9 +16,7 @@
 package org.osgi.test.junit5.cm;
 
 import java.util.Dictionary;
-import java.util.Map;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Nested;
@@ -27,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.service.cm.Configuration;
+import org.osgi.test.assertj.dictionary.DictionaryAssert;
 import org.osgi.test.common.annotation.config.InjectConfiguration;
 import org.osgi.test.common.annotation.config.WithConfiguration;
 import org.osgi.test.common.dictionary.Dictionaries;
@@ -47,7 +46,6 @@ public class ConfigAnnotationNested {
 		@InjectConfiguration("class.inner2") Configuration c_class_Inner2,
 		@InjectConfiguration("class.inner2.method1") Configuration c_class_Inner2_Method1) throws Exception {
 
-
 		SoftAssertions softly = new SoftAssertions();
 		softly.assertThat(c_class)
 			.isNotNull();
@@ -63,6 +61,7 @@ public class ConfigAnnotationNested {
 			.isNull();
 		softly.assertThat(c_class_Inner2_Method1)
 			.isNull();
+		softly.assertAll();
 	}
 
 	@WithConfiguration(pid = "class.inner1")
@@ -97,7 +96,7 @@ public class ConfigAnnotationNested {
 				.isNull();
 			softly.assertThat(c_class_Inner2_Method1)
 				.isNull();
-
+			softly.assertAll();
 			c_class_Inner1.update(Dictionaries.dictionaryOf(KEY, "any"));
 
 		}
@@ -129,10 +128,10 @@ public class ConfigAnnotationNested {
 				.isNull();
 			softly.assertThat(c_class_Inner2_Method1)
 				.isNull();
-
+			softly.assertAll();
 			Dictionary<String, Object> properties = c_class_Inner1.getProperties();
-			Map<String, Object> map = Dictionaries.asMap(properties);
-			Assertions.assertThat(map)
+
+			DictionaryAssert.assertThat(properties)
 				.doesNotContainKey(KEY);
 		}
 	}
@@ -168,6 +167,7 @@ public class ConfigAnnotationNested {
 			softly.assertThat(c_class_Inner2_Method1)
 				.isNotNull();
 
+			softly.assertAll();
 		}
 	}
 }

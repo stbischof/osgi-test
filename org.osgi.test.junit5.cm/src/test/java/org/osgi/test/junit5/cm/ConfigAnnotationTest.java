@@ -32,7 +32,6 @@ import org.osgi.test.common.annotation.config.ConfigEntry;
 import org.osgi.test.common.annotation.config.InjectConfiguration;
 import org.osgi.test.common.annotation.config.WithConfiguration;
 import org.osgi.test.common.annotation.config.WithFactoryConfiguration;
-import org.osgi.test.common.dictionary.Dictionaries;
 import org.osgi.test.junit5.service.ServiceExtension;
 
 @ExtendWith({
@@ -73,8 +72,10 @@ public class ConfigAnnotationTest {
 		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, NONSTATIC_CONFIGURATION_PID);
 
 		assertThat(cs).isEqualTo(nonStaticConfiguration);
-		assertThat(Dictionaries.asMap(cs.getProperties()))
-			.containsExactlyEntriesOf(Dictionaries.asMap(nonStaticConfiguration.getProperties()));
+
+		DictionaryAssert.assertThat(cs.getProperties())
+			.containsExactlyInAnyOrderEntriesOf(nonStaticConfiguration.getProperties());
+
 	}
 
 	static final String PARAM_PID = "param.pid";
@@ -89,8 +90,8 @@ public class ConfigAnnotationTest {
 		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, PARAM_PID);
 		assertThat(cs).isEqualTo(configuration);
 
-		assertThat(Dictionaries.asMap(cs.getProperties()))
-			.containsExactlyEntriesOf(Dictionaries.asMap(configuration.getProperties()));
+		DictionaryAssert.assertThat(cs.getProperties())
+			.containsExactlyInAnyOrderEntriesOf(configuration.getProperties());
 
 		DictionaryAssert.assertThat(configuration.getProperties())
 			.doesNotContainKey("foo")
@@ -108,8 +109,8 @@ public class ConfigAnnotationTest {
 		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, PARAM_PID);
 		assertThat(cs).isEqualTo(configuration);
 
-		assertThat(Dictionaries.asMap(cs.getProperties()))
-			.containsExactlyEntriesOf(Dictionaries.asMap(configuration.getProperties()));
+		DictionaryAssert.assertThat(cs.getProperties())
+			.containsExactlyInAnyOrderEntriesOf(configuration.getProperties());
 
 		DictionaryAssert.assertThat(configuration.getProperties())
 			.doesNotContainKey("bar")

@@ -23,6 +23,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.service.cm.Configuration;
+import org.osgi.test.assertj.dictionary.DictionaryAssert;
 import org.osgi.test.common.annotation.config.ConfigEntry;
 import org.osgi.test.common.annotation.config.ConfigEntry.Scalar;
 import org.osgi.test.common.annotation.config.ConfigEntry.Type;
@@ -51,27 +52,26 @@ public class InjectWith {
 		Assertions.assertThat(c)
 			.isNotNull();
 
-		Map<String, Object> props = Dictionaries.asMap(c.getProperties());
-		Assertions.assertThat(props)
+		DictionaryAssert.assertThat(c.getProperties())
 			.extracting("PrimitiveArray")
 			.isInstanceOf(int[].class)
 			.isEqualTo(new int[] {
 				1, 2
 			});
 
-		Assertions.assertThat(props)
+		DictionaryAssert.assertThat(c.getProperties())
 			.extracting("Array")
 			.isInstanceOf(Integer[].class)
 			.isEqualTo(new Integer[] {
 				1, 2
 			});
 
-		Assertions.assertThat(props)
+		DictionaryAssert.assertThat(c.getProperties())
 			.extracting("Collection")
 			.isInstanceOf(Collection.class)
 			.isEqualTo(Arrays.asList(1, 2));
 
-		Assertions.assertThat(props)
+		DictionaryAssert.assertThat(c.getProperties())
 			.extracting("Scalar")
 			.isInstanceOf(Integer.class)
 			.isEqualTo(1);

@@ -53,8 +53,7 @@ public class ConfigAnnotationRemove {
 
 	@Test
 	@Order(3)
-	public void test_factory_remove(@InjectConfiguration(MY_FACTORY_PID + "~"
-		+ MY_FACTORY_NAME) Configuration c)
+	public void test_factory_remove(@InjectConfiguration(MY_FACTORY_PID + "~" + MY_FACTORY_NAME) Configuration c)
 		throws Exception {
 		Assertions.assertThat(c)
 			.isNotNull();
@@ -64,8 +63,7 @@ public class ConfigAnnotationRemove {
 
 	@Test
 	@Order(4)
-	public void test_factory_exist(
-		@InjectConfiguration(MY_FACTORY_PID + "~" + MY_FACTORY_NAME) Configuration c)
+	public void test_factory_exist(@InjectConfiguration(MY_FACTORY_PID + "~" + MY_FACTORY_NAME) Configuration c)
 		throws Exception {
 		Assertions.assertThat(c)
 			.isNotNull();
