@@ -15,8 +15,6 @@
  */
 package org.osgi.test.junit5.cm;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -49,7 +47,10 @@ public class InjectWith {
 			"1", "2"
 		})//
 	})) Configuration c) throws Exception {
-		assertNotNull(c);
+
+		Assertions.assertThat(c)
+			.isNotNull();
+
 		Map<String, Object> props = Dictionaries.asMap(c.getProperties());
 		Assertions.assertThat(props)
 			.extracting("PrimitiveArray")
@@ -81,7 +82,8 @@ public class InjectWith {
 	public void test2(
 		@InjectConfiguration(withFactoryConfig = @WithFactoryConfiguration(factoryPid = "pid2", name = "name")) Configuration c)
 		throws Exception {
-		assertNotNull(c);
+		Assertions.assertThat(c)
+			.isNotNull();
 	}
 
 }

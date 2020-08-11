@@ -16,8 +16,6 @@
 package org.osgi.test.junit5.cm;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,12 +26,18 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.test.assertj.dictionary.DictionaryAssert;
+import org.osgi.test.common.annotation.InjectService;
 import org.osgi.test.common.annotation.config.ConfigEntry;
 import org.osgi.test.common.annotation.config.InjectConfiguration;
 import org.osgi.test.common.annotation.config.WithConfiguration;
 import org.osgi.test.common.annotation.config.WithFactoryConfiguration;
+import org.osgi.test.common.dictionary.Dictionaries;
+import org.osgi.test.junit5.service.ServiceExtension;
 
-@ExtendWith(ConfigurationExtension.class)
+@ExtendWith({
+	ConfigurationExtension.class, ServiceExtension.class
+})
 @WithConfiguration(pid = ConfigAnnotationTest.NONSTATIC_CONFIGURATION_PID)
 public class ConfigAnnotationTest {
 
@@ -41,25 +45,12 @@ public class ConfigAnnotationTest {
 	public static final String							NONSTATIC_CONFIGURATION_PID	= "nonstatic.configuration.pid";
 
 	private static ServiceReference<ConfigurationAdmin>	sref						= null;
-	private static BundleContext						bundleContext				= null;
 	private static ConfigurationAdmin					ca							= null;
 
 	@BeforeAll
-	public static void beforeAll() {
+	public static void beforeAll(@InjectService ConfigurationAdmin configurationAdmin) {
 
-		bundleContext = FrameworkUtil.getBundle(ConfigAnnotationTest.class)
-			.getBundleContext();
-
-		sref = bundleContext.getServiceReference(ConfigurationAdmin.class);
-		if (sref == null) {
-			throw new IllegalStateException("The configuration admin service cannot be found.");
-		}
-
-		ca = bundleContext.getService(sref);
-		if (ca == null) {
-			throw new IllegalStateException("The configuration admin service cannot be found.");
-		}
-
+		ca = configurationAdmin;
 	}
 
 	@AfterAll
@@ -82,7 +73,8 @@ public class ConfigAnnotationTest {
 		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, NONSTATIC_CONFIGURATION_PID);
 
 		assertThat(cs).isEqualTo(nonStaticConfiguration);
-
+		assertThat(Dictionaries.asMap(cs.getProperties()))
+			.containsExactlyEntriesOf(Dictionaries.asMap(nonStaticConfiguration.getProperties()));
 	}
 
 	static final String PARAM_PID = "param.pid";
@@ -91,51 +83,51 @@ public class ConfigAnnotationTest {
 	@WithConfiguration(pid = PARAM_PID, properties = {
 		@ConfigEntry(key = "bar", value = "foo")
 	})
-	public void testParameterConfiguration(
-		@InjectConfiguration(PARAM_PID) Configuration configuration)
+	public void testParameterConfiguration(@InjectConfiguration(PARAM_PID) Configuration configuration)
 		throws Exception {
 
 		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, PARAM_PID);
 		assertThat(cs).isEqualTo(configuration);
 
-		assertNull(configuration.getProperties()
-			.get("foo"));
+		assertThat(Dictionaries.asMap(cs.getProperties()))
+			.containsExactlyEntriesOf(Dictionaries.asMap(configuration.getProperties()));
 
-		String foo = (String) configuration.getProperties()
-			.get("bar");
-		assertEquals("foo", foo);
+		DictionaryAssert.assertThat(configuration.getProperties())
+			.doesNotContainKey("foo")
+			.containsEntry("bar", "foo");
+
 	}
 
 	@Test
 	@WithConfiguration(pid = PARAM_PID, properties = {
 		@ConfigEntry(key = "foo", value = "bar")
 	})
-	public void testParameterConfiguration2(
-		@InjectConfiguration(PARAM_PID) Configuration configuration)
+	public void testParameterConfiguration2(@InjectConfiguration(PARAM_PID) Configuration configuration)
 		throws Exception {
 
 		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, PARAM_PID);
 		assertThat(cs).isEqualTo(configuration);
 
-		assertNull(configuration.getProperties()
-			.get("bar"));
-		String bar = (String) configuration.getProperties()
-			.get("foo");
-		assertEquals("bar", bar);
+		assertThat(Dictionaries.asMap(cs.getProperties()))
+			.containsExactlyEntriesOf(Dictionaries.asMap(configuration.getProperties()));
+
+		DictionaryAssert.assertThat(configuration.getProperties())
+			.doesNotContainKey("bar")
+			.containsEntry("foo", "bar");
+
 	}
 
 	@Test
 	@WithConfiguration(pid = PARAM_PID)
-	public void testParameterConfiguration3(
-		@InjectConfiguration(PARAM_PID) Configuration configuration)
+	public void testParameterConfiguration3(@InjectConfiguration(PARAM_PID) Configuration configuration)
 		throws Exception {
 
 		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, PARAM_PID);
 
-		assertNull(configuration.getProperties()
-			.get("foo"));
-		assertNull(configuration.getProperties()
-			.get("bar"));
+		DictionaryAssert.assertThat(configuration.getProperties())
+			.doesNotContainKey("foo")
+			.doesNotContainKey("bar");
+
 	}
 
 	static final String METHOD_PID = "method.pid";
@@ -148,8 +140,9 @@ public class ConfigAnnotationTest {
 
 		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, METHOD_PID);
 		assertThat(cs).isNotNull();
-		assertEquals("bar", cs.getProperties()
-			.get("foo"));
+
+		DictionaryAssert.assertThat(cs.getProperties())
+			.containsEntry("foo", "bar");
 	}
 
 	@Test
@@ -161,13 +154,13 @@ public class ConfigAnnotationTest {
 		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, FACTORY_CONFIGURATION_PID + "~factory.name");
 		assertThat(cs).isNotNull();
 
-		assertEquals("bar", cs.getProperties()
-			.get("foo"));
+		DictionaryAssert.assertThat(cs.getProperties())
+			.containsEntry("foo", "bar");
+
 	}
 
 	@Test
-	@WithFactoryConfiguration(factoryPid = FACTORY_CONFIGURATION_PID, name = "factory.name2", properties =
-	{
+	@WithFactoryConfiguration(factoryPid = FACTORY_CONFIGURATION_PID, name = "factory.name2", properties = {
 		@ConfigEntry(key = "foo", value = "bar")
 	})
 	public void testMethodConfigurationFactoryCreate() throws Exception {
@@ -175,8 +168,9 @@ public class ConfigAnnotationTest {
 		Configuration cs = ConfigUtil.getConfigsByServicePid(ca, FACTORY_CONFIGURATION_PID + "~factory.name2");
 		assertThat(cs).isNotNull();
 
-		assertEquals("bar", cs.getProperties()
-			.get("foo"));
+		DictionaryAssert.assertThat(cs.getProperties())
+			.containsEntry("foo", "bar");
+
 	}
 
 }

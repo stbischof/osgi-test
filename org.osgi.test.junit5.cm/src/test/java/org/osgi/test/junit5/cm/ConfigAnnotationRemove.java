@@ -15,8 +15,7 @@
  */
 package org.osgi.test.junit5.cm;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,14 +39,16 @@ public class ConfigAnnotationRemove {
 	@Test
 	@Order(1)
 	public void test_remove(@InjectConfiguration(MY_PID) Configuration c) throws Exception {
-		assertNotNull(c);
+		Assertions.assertThat(c)
+			.isNotNull();
 		c.delete();
 	}
 
 	@Test
 	@Order(2)
 	public void test_exist(@InjectConfiguration(MY_PID) Configuration c) throws Exception {
-		assertNotNull(c);
+		Assertions.assertThat(c)
+			.isNotNull();
 	}
 
 	@Test
@@ -55,7 +56,8 @@ public class ConfigAnnotationRemove {
 	public void test_factory_remove(@InjectConfiguration(MY_FACTORY_PID + "~"
 		+ MY_FACTORY_NAME) Configuration c)
 		throws Exception {
-		assertNotNull(c);
+		Assertions.assertThat(c)
+			.isNotNull();
 		c.delete();
 
 	}
@@ -65,6 +67,7 @@ public class ConfigAnnotationRemove {
 	public void test_factory_exist(
 		@InjectConfiguration(MY_FACTORY_PID + "~" + MY_FACTORY_NAME) Configuration c)
 		throws Exception {
-		assertNotNull(c);
+		Assertions.assertThat(c)
+			.isNotNull();
 	}
 }

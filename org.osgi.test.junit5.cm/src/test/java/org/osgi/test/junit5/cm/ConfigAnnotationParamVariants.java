@@ -15,18 +15,17 @@
  */
 package org.osgi.test.junit5.cm;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 import java.util.Dictionary;
 import java.util.Map;
 import java.util.Optional;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.service.cm.Configuration;
+import org.osgi.test.assertj.dictionary.DictionaryAssert;
 import org.osgi.test.common.annotation.config.ConfigEntry;
 import org.osgi.test.common.annotation.config.InjectConfiguration;
 import org.osgi.test.common.annotation.config.WithConfiguration;
@@ -42,26 +41,32 @@ public class ConfigAnnotationParamVariants {
 
 	@Test
 	public void test_Parameter_Configuration(@InjectConfiguration(MY_PID) Configuration c) throws Exception {
-		assertNotNull(c);
+
+
+		Assertions.assertThat(c)
+			.isNotNull();
+
 		assertDictionary(c.getProperties());
 	}
 
 	private void assertDictionary(Dictionary<String, Object> properties) {
-		assertEquals("1", properties.get("a"));
-
+		DictionaryAssert.assertThat(properties)
+			.containsEntry("a", "1");
 	}
 
 	@Test
 	public void test_Parameter_Dictionary(
 		@InjectConfiguration(MY_PID) Dictionary<String, Object> dictionary)
 		throws Exception {
-		assertNotNull(dictionary);
+		Assertions.assertThat(dictionary)
+			.isNotNull();
 		assertDictionary(dictionary);
 	}
 
 	@Test
 	public void test_Parameter_Map(@InjectConfiguration(MY_PID) Map<String, Object> map) throws Exception {
-		assertNotNull(map);
+		Assertions.assertThat(map)
+			.isNotNull();
 		assertDictionary(Dictionaries.asDictionary(map));
 	}
 
@@ -69,8 +74,9 @@ public class ConfigAnnotationParamVariants {
 	public void test_Parameter_Optional_NotNull(
 		@InjectConfiguration(MY_PID) Optional<Configuration> cOptional)
 		throws Exception {
-		assertNotNull(cOptional);
-		assertTrue(cOptional.isPresent());
+		Assertions.assertThat(cOptional)
+			.isNotNull()
+			.isPresent();
 
 		assertDictionary(cOptional.get()
 			.getProperties());
@@ -80,8 +86,10 @@ public class ConfigAnnotationParamVariants {
 	public void test_Parameter_Optional_Null(
 		@InjectConfiguration("unknown.pid") Optional<Configuration> cOptional)
 		throws Exception {
-		assertNotNull(cOptional);
-		assertFalse(cOptional.isPresent());
+
+		Assertions.assertThat(cOptional)
+			.isNotNull()
+			.isNotPresent();
 
 	}
 

@@ -15,13 +15,11 @@
  */
 package org.osgi.test.junit5.cm;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import java.util.Dictionary;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
@@ -48,13 +46,23 @@ public class ConfigAnnotationNested {
 		@InjectConfiguration("class.inner1.method2") Configuration c_class_Inner1_Method2,
 		@InjectConfiguration("class.inner2") Configuration c_class_Inner2,
 		@InjectConfiguration("class.inner2.method1") Configuration c_class_Inner2_Method1) throws Exception {
-		assertNotNull(c_class);
-		assertNotNull(c_class_Method1);
-		assertNull(c_class_Inner1);
-		assertNull(c_class_Inner1_Method1);
-		assertNull(c_class_Inner1_Method2);
-		assertNull(c_class_Inner2);
-		assertNull(c_class_Inner2_Method1);
+
+
+		SoftAssertions softly = new SoftAssertions();
+		softly.assertThat(c_class)
+			.isNotNull();
+		softly.assertThat(c_class_Method1)
+			.isNotNull();
+		softly.assertThat(c_class_Inner1)
+			.isNull();
+		softly.assertThat(c_class_Inner1_Method1)
+			.isNull();
+		softly.assertThat(c_class_Inner1_Method2)
+			.isNull();
+		softly.assertThat(c_class_Inner2)
+			.isNull();
+		softly.assertThat(c_class_Inner2_Method1)
+			.isNull();
 	}
 
 	@WithConfiguration(pid = "class.inner1")
@@ -72,13 +80,23 @@ public class ConfigAnnotationNested {
 			@InjectConfiguration("class.inner1.method2") Configuration c_class_Inner1_Method2,
 			@InjectConfiguration("class.inner2") Configuration c_class_Inner2,
 			@InjectConfiguration("class.inner2.method1") Configuration c_class_Inner2_Method1) throws Exception {
-			assertNotNull(c_class);
-			assertNull(c_class_Method1);
-			assertNotNull(c_class_Inner1);
-			assertNotNull(c_class_Inner1_Method1);
-			assertNull(c_class_Inner1_Method2);
-			assertNull(c_class_Inner2);
-			assertNull(c_class_Inner2_Method1);
+
+			SoftAssertions softly = new SoftAssertions();
+
+			softly.assertThat(c_class)
+				.isNotNull();
+			softly.assertThat(c_class_Method1)
+				.isNull();
+			softly.assertThat(c_class_Inner1)
+				.isNotNull();
+			softly.assertThat(c_class_Inner1_Method1)
+				.isNotNull();
+			softly.assertThat(c_class_Inner1_Method2)
+				.isNull();
+			softly.assertThat(c_class_Inner2)
+				.isNull();
+			softly.assertThat(c_class_Inner2_Method1)
+				.isNull();
 
 			c_class_Inner1.update(Dictionaries.dictionaryOf(KEY, "any"));
 
@@ -94,13 +112,23 @@ public class ConfigAnnotationNested {
 			@InjectConfiguration("class.inner1.method2") Configuration c_class_Inner1_Method2,
 			@InjectConfiguration("class.inner2") Configuration c_class_Inner2,
 			@InjectConfiguration("class.inner2.method1") Configuration c_class_Inner2_Method1) throws Exception {
-			assertNotNull(c_class);
-			assertNull(c_class_Method1);
-			assertNotNull(c_class_Inner1);
-			assertNull(c_class_Inner1_Method1);
-			assertNotNull(c_class_Inner1_Method2);
-			assertNull(c_class_Inner2);
-			assertNull(c_class_Inner2_Method1);
+
+			SoftAssertions softly = new SoftAssertions();
+
+			softly.assertThat(c_class)
+				.isNotNull();
+			softly.assertThat(c_class_Method1)
+				.isNull();
+			softly.assertThat(c_class_Inner1)
+				.isNotNull();
+			softly.assertThat(c_class_Inner1_Method1)
+				.isNull();
+			softly.assertThat(c_class_Inner1_Method2)
+				.isNotNull();
+			softly.assertThat(c_class_Inner2)
+				.isNull();
+			softly.assertThat(c_class_Inner2_Method1)
+				.isNull();
 
 			Dictionary<String, Object> properties = c_class_Inner1.getProperties();
 			Map<String, Object> map = Dictionaries.asMap(properties);
@@ -122,13 +150,23 @@ public class ConfigAnnotationNested {
 			@InjectConfiguration("class.inner1.method2") Configuration c_class_Inner1_Method2,
 			@InjectConfiguration("class.inner2") Configuration c_class_Inner2,
 			@InjectConfiguration("class.inner2.method1") Configuration c_class_Inner2_Method1) throws Exception {
-			assertNotNull(c_class);
-			assertNull(c_class_Method1);
-			assertNull(c_class_Inner1);
-			assertNull(c_class_Inner1_Method1);
-			assertNull(c_class_Inner1_Method2);
-			assertNotNull(c_class_Inner2);
-			assertNotNull(c_class_Inner2_Method1);
+
+			SoftAssertions softly = new SoftAssertions();
+
+			softly.assertThat(c_class)
+				.isNotNull();
+			softly.assertThat(c_class_Method1)
+				.isNull();
+			softly.assertThat(c_class_Inner1)
+				.isNull();
+			softly.assertThat(c_class_Inner1_Method1)
+				.isNull();
+			softly.assertThat(c_class_Inner1_Method2)
+				.isNull();
+			softly.assertThat(c_class_Inner2)
+				.isNotNull();
+			softly.assertThat(c_class_Inner2_Method1)
+				.isNotNull();
 
 		}
 	}

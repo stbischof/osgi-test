@@ -51,4 +51,6 @@
 	org.osgi.service.cm;version='[1.6.0,1.6.1)',\
 	org.osgi.test.common;version='[0.10.0,0.10.1)',\
 	org.osgi.test.junit5.cm;version='[0.10.0,0.10.1)',\
-	org.osgi.test.junit5.cm-tests;version='[0.10.0,0.10.1)'
+	org.osgi.test.junit5.cm-tests;version='[0.10.0,0.10.1)',\
+	org.osgi.test.assertj.framework;version='[0.10.0,0.10.1)',\
+	org.osgi.test.junit5;version='[0.10.0,0.10.1)'
