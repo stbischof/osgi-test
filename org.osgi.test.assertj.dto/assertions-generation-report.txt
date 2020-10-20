@@ -1,0 +1,108 @@
+
+
+====================================
+AssertJ assertions generation report
+====================================
+
+--- Generator input parameters ---
+
+Generating AssertJ assertions for classes in following packages and subpackages:
+- org.osgi.framework.dto
+- org.osgi.framework.startlevel.dto
+- org.osgi.framework.wiring.dto
+- org.osgi.resource.dto
+- org.osgi.service.component.runtime.dto
+- org.osgi.service.http.runtime.dto
+- org.osgi.service.http.runtime.dto
+- org.osgi.service.http.runtime.dto
+- org.osgi.service.http.runtime.dto
+- org.osgi.service.http.runtime.dto
+
+Input classes excluded from assertions generation:
+- org.osgi.service.http.runtime.dto.DTOConstants
+
+--- Generator results ---
+
+Directory where custom assertions files have been generated:
+- src/main/java
+
+Custom assertions files generated:
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/dto/AbstractBundleDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/dto/AbstractFrameworkDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/dto/AbstractServiceReferenceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/dto/BundleDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/dto/FrameworkDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/dto/ServiceReferenceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/startlevel/dto/AbstractBundleStartLevelDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/startlevel/dto/AbstractFrameworkStartLevelDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/startlevel/dto/BundleStartLevelDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/startlevel/dto/FrameworkStartLevelDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/wiring/dto/AbstractBundleRevisionDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/wiring/dto/AbstractBundleWireDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/wiring/dto/AbstractBundleWiringDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/wiring/dto/BundleRevisionDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/wiring/dto/BundleWireDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/framework/wiring/dto/BundleWiringDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/AbstractCapabilityDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/AbstractCapabilityRefDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/AbstractRequirementDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/AbstractRequirementRefDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/AbstractResourceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/AbstractWireDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/AbstractWiringDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/CapabilityDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/CapabilityRefDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/RequirementDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/RequirementRefDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/ResourceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/WireDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/resource/dto/WiringDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/component/runtime/dto/AbstractComponentConfigurationDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/component/runtime/dto/AbstractComponentDescriptionDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/component/runtime/dto/AbstractReferenceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/component/runtime/dto/AbstractSatisfiedReferenceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/component/runtime/dto/AbstractUnsatisfiedReferenceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/component/runtime/dto/ComponentConfigurationDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/component/runtime/dto/ComponentDescriptionDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/component/runtime/dto/ReferenceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/component/runtime/dto/SatisfiedReferenceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/component/runtime/dto/UnsatisfiedReferenceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractBaseServletDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractErrorPageDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractFailedErrorPageDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractFailedFilterDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractFailedListenerDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractFailedResourceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractFailedServletContextDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractFailedServletDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractFilterDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractListenerDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractRequestInfoDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractResourceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractRuntimeDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractServletContextDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/AbstractServletDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/BaseServletDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/ErrorPageDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/FailedErrorPageDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/FailedFilterDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/FailedListenerDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/FailedResourceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/FailedServletContextDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/FailedServletDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/FilterDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/ListenerDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/RequestInfoDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/ResourceDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/RuntimeDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/ServletContextDTOAssert.java
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/service/http/runtime/dto/ServletDTOAssert.java
+
+Assertions entry point class has been generated in file:
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/test/assertj/dto/Assertions.java
+
+BddAssertions entry point class has been generated in file:
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/test/assertj/dto/BddAssertions.java
+
+SoftAssertions entry point class has been generated in file:
+- /var/home/stbischof/dev/git/osgi-test/org.osgi.test.assertj.dto/src/main/java/org/osgi/test/assertj/dto/SoftAssertions.java
