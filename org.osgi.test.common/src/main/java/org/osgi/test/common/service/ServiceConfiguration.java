@@ -43,6 +43,7 @@ public class ServiceConfiguration<S> implements AutoCloseable, ServiceAware<S> {
 	private final Class<S>					serviceType;
 	private final long						timeout;
 	private volatile ServiceTracker<S, S>	tracker;
+	private Optional<InnerCustomizer<S>>	oInnerCustomizer	= Optional.empty();
 
 	public ServiceConfiguration(ServiceConfigurationKey<S> key) {
 		this(key.serviceType, key.filter, key.filterArguments, key.cardinality, key.timeout);
@@ -72,18 +73,17 @@ public class ServiceConfiguration<S> implements AutoCloseable, ServiceAware<S> {
 	public ServiceConfiguration<S> init(BundleContext bundleContext) {
 		CountDownLatch countDownLatch = new CountDownLatch(getCardinality());
 
-		ServiceTracker<S, S> tracker = new ServiceTracker<>(bundleContext, getFilter(),
-			new InnerCustomizer<>(bundleContext, countDownLatch, getCustomizer()));
+		InnerCustomizer<S> innerCustomizer = new InnerCustomizer<>(bundleContext, countDownLatch, getCustomizer());
+		oInnerCustomizer = Optional.of(innerCustomizer);
+		ServiceTracker<S, S> tracker = new ServiceTracker<>(bundleContext, getFilter(), innerCustomizer);
 		tracker.open();
 
 		try {
 			final Instant endTime = Instant.now()
 				.plusMillis(getTimeout());
 			if (!countDownLatch.await(getTimeout(), TimeUnit.MILLISECONDS)) {
-				throw new AssertionError(
-					getCardinality() - tracker.size() + "/" + getCardinality() + " services " + getFilter()
-						+ " didn't arrive within "
-						+ getTimeout() + "ms");
+				throw new AssertionError(getCardinality() - tracker.size() + "/" + getCardinality() + " services "
+					+ getFilter() + " didn't arrive within " + getTimeout() + "ms");
 			}
 
 			// CountDownLatch is fired when the last addingService() is called,
@@ -94,10 +94,8 @@ public class ServiceConfiguration<S> implements AutoCloseable, ServiceAware<S> {
 				if (Instant.now()
 					.isAfter(endTime)) {
 
-					throw new AssertionError(
-						getCardinality() - tracker.size() + "/" + getCardinality() + " services " + getFilter()
-							+ " didn't arrive within "
-							+ getTimeout() + "ms");
+					throw new AssertionError(getCardinality() - tracker.size() + "/" + getCardinality() + " services "
+						+ getFilter() + " didn't arrive within " + getTimeout() + "ms");
 				}
 				Thread.sleep(10);
 			}
@@ -118,8 +116,7 @@ public class ServiceConfiguration<S> implements AutoCloseable, ServiceAware<S> {
 
 	@Override
 	public String toString() {
-		return String.format(
-			"ServiceConfiguration [Class=\"%s\", filter=\"%s\", cardinality=%s, timeout=%s]",
+		return String.format("ServiceConfiguration [Class=\"%s\", filter=\"%s\", cardinality=%s, timeout=%s]",
 			getServiceType(), getFilter(), getCardinality(), getTimeout());
 	}
 
@@ -195,6 +192,24 @@ public class ServiceConfiguration<S> implements AutoCloseable, ServiceAware<S> {
 	}
 
 	@Override
+	public int getAddingCount() {
+		return oInnerCustomizer.map(InnerCustomizer::getAddingCount)
+			.orElse(0);
+	}
+
+	@Override
+	public int getModifiedCount() {
+		return oInnerCustomizer.map(InnerCustomizer::getModifiedCount)
+			.orElse(0);
+	}
+
+	@Override
+	public int getRemovedCount() {
+		return oInnerCustomizer.map(InnerCustomizer::getRemovedCount)
+			.orElse(0);
+	}
+
+	@Override
 	public SortedMap<ServiceReference<S>, S> getTracked() {
 		return tracker.getTracked();
 	}
@@ -220,6 +235,12 @@ public class ServiceConfiguration<S> implements AutoCloseable, ServiceAware<S> {
 		private final CountDownLatch							countDownLatch;
 		private final Optional<ServiceTrackerCustomizer<S, S>>	delegate;
 
+		int														addingCounter;
+
+		int														modifiedCounter;
+
+		int														removeCounter;
+
 		InnerCustomizer(BundleContext bundleContext, CountDownLatch countDownLatch,
 			ServiceTrackerCustomizer<S, S> delegate) {
 			this.bundleContext = bundleContext;
@@ -229,6 +250,7 @@ public class ServiceConfiguration<S> implements AutoCloseable, ServiceAware<S> {
 
 		@Override
 		public S addingService(ServiceReference<S> reference) {
+			addingCounter++;
 			final S service = delegate.map(c -> c.addingService(reference))
 				.orElseGet(() -> bundleContext.getService(reference));
 
@@ -243,16 +265,30 @@ public class ServiceConfiguration<S> implements AutoCloseable, ServiceAware<S> {
 
 		@Override
 		public void modifiedService(ServiceReference<S> reference, S service) {
+			modifiedCounter++;
 			delegate.ifPresent(c -> c.modifiedService(reference, service));
 		}
 
 		@Override
 		public void removedService(ServiceReference<S> reference, S service) {
+			removeCounter++;
 			delegate.map(c -> {
 				c.removedService(reference, service);
 				return true;
 			})
 				.orElseGet(() -> bundleContext.ungetService(reference));
+		}
+
+		public int getAddingCount() {
+			return addingCounter;
+		}
+
+		public int getModifiedCount() {
+			return modifiedCounter;
+		}
+
+		public int getRemovedCount() {
+			return removeCounter;
 		}
 
 	}

@@ -42,6 +42,12 @@ public interface ServiceAware<T> {
 
 	int getTrackingCount();
 
+	int getRemovedCount();
+	
+	int getModifiedCount();
+	
+	int getAddingCount();
+
 	boolean isEmpty();
 
 	int size();
@@ -53,5 +59,6 @@ public interface ServiceAware<T> {
 	Filter getFilter();
 
 	long getTimeout();
+
 
 }
