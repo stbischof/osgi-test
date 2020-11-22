@@ -155,13 +155,8 @@ public class EventStoreTest {
 
 		List<ServiceRegistration<?>> regs = new ArrayList<ServiceRegistration<?>>();
 
-		for (int i = 0; i < 5; i++) {
-			Thread.sleep(10);
-			new Thread(() -> {
-				regs.add(bc.registerService(A.class, new A() {},
-					Dictionaries.dictionaryOf("a", System.currentTimeMillis())));
-			}).start();
-		}
+		regs.add(bc.registerService(A.class, new A() {}, Dictionaries.dictionaryOf("a", System.currentTimeMillis())));
+		regs.add(bc.registerService(A.class, new A() {}, Dictionaries.dictionaryOf("a", System.currentTimeMillis())));
 
 		Result<ServiceReferenceData<A>> result = observer.waitFor(200, TimeUnit.MILLISECONDS);
 		assertThat(result).isNotNull();

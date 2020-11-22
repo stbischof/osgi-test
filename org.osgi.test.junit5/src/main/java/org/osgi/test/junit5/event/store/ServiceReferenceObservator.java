@@ -11,6 +11,12 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.test.junit5.event.store.ServiceReferenceObservator.ServiceReferenceData;
 import org.osgi.util.tracker.ServiceTracker;
 
+/**
+ * Maybe We dont need this if we use the service-events. Thread-Problems
+ *
+ * @author stbischof
+ * @param <T>
+ */
 public class ServiceReferenceObservator<T> extends AbstractObserver<ServiceReferenceData<T>> {
 
 	ServiceTracker<T, T>			tracker;
@@ -38,7 +44,6 @@ public class ServiceReferenceObservator<T> extends AbstractObserver<ServiceRefer
 			public void modifiedService(ServiceReference<T> reference, T service) {
 				modifiedCount++;
 				super.modifiedService(reference, service);
-
 			}
 
 			@Override
