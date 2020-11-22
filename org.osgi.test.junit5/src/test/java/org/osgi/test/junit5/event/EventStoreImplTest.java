@@ -37,7 +37,10 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.test.common.annotation.InjectBundleContext;
 import org.osgi.test.junit5.context.BundleContextExtension;
-import org.osgi.test.junit5.event.EventObservator.Result;
+import org.osgi.test.junit5.event.store.EventStore;
+import org.osgi.test.junit5.event.store.EventStoreImpl;
+import org.osgi.test.junit5.event.store.Observer;
+import org.osgi.test.junit5.event.store.Observer.Result;
 
 @ExtendWith(BundleContextExtension.class)
 public class EventStoreImplTest {
@@ -48,7 +51,7 @@ public class EventStoreImplTest {
 	public void beforeEachTest(@InjectBundleContext BundleContext bc) {
 
 		this.bundle = bc.getBundle();
-		store = new EventStoreImpl();
+		store = new EventStoreImpl(bc);
 		// All clear
 		assertThat(store.getEvents()
 			.count()).isEqualTo(0);
@@ -69,8 +72,8 @@ public class EventStoreImplTest {
 		store.addFrameworkListenerDelegate(listener);
 
 		// Create Observer that catches Events
-		EventObservator<List<FrameworkEvent>> observator = store
-			.newFrameworkEventObervator(EventStore.isFrameworkEventType(FrameworkEvent.ERROR), 1);
+		Observer<List<FrameworkEvent>> observator = store
+			.newFrameworkEventObervator(EventStore.isFrameworkEventType(FrameworkEvent.ERROR), 1, true);
 
 		// Create and fire event
 		FrameworkEvent event = new FrameworkEvent(FrameworkEvent.ERROR, bundle, null);
@@ -112,8 +115,8 @@ public class EventStoreImplTest {
 		store.addBundleListenerDelegate(listener);
 
 		// Create Observer that catches Events
-		EventObservator<List<BundleEvent>> observator = store
-			.newBundleEventObervator(EventStore.isBundleEventType(BundleEvent.INSTALLED), 1);
+		Observer<List<BundleEvent>> observator = store
+			.newBundleEventObervator(EventStore.isBundleEventType(BundleEvent.INSTALLED), 1, true);
 
 		// Create and fire event
 		BundleEvent event = new BundleEvent(BundleEvent.INSTALLED, bundle, bundle);
@@ -159,8 +162,8 @@ public class EventStoreImplTest {
 		store.addServiceListenerDelegate(listener);
 
 		// Create Observer that catches Events
-		EventObservator<List<ServiceEvent>> observator = store
-			.newServiceEventObervator(EventStore.isServiceEventType(ServiceEvent.REGISTERED), 1);
+		Observer<List<ServiceEvent>> observator = store
+			.newServiceEventObervator(EventStore.isServiceEventType(ServiceEvent.REGISTERED), 1, true);
 
 		// Create and fire event
 		ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, sr);

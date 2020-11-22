@@ -1,22 +1,24 @@
-package org.osgi.test.junit5.event;
+package org.osgi.test.junit5.event.store;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.test.junit5.event.store.ServiceReferenceObservator.ServiceReferenceData;
+import org.osgi.util.tracker.ServiceTracker;
 
 public class EventStoreImpl implements FrameworkListener, BundleListener, ServiceListener, EventStore {
 
@@ -27,8 +29,10 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 		.synchronizedList(new CopyOnWriteArrayList<>());
 	private List<ServiceListener>	serviceListenerDelegate		= Collections
 		.synchronizedList(new CopyOnWriteArrayList<>());
+	private BundleContext			bundleContext;
 
-	public EventStoreImpl() {
+	public EventStoreImpl(BundleContext bundleContext) {
+		this.bundleContext = bundleContext;
 		resetEvents();
 	}
 
@@ -143,109 +147,28 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 	}
 
 	@Override
-	public EventObservator<List<BundleEvent>> newBundleEventObervator(Predicate<BundleEvent> matches, int count) {
-		CountDownLatch conditionLatch = new CountDownLatch(count);
-		List<BundleEvent> events = Collections.synchronizedList(new ArrayList<>());
-		BundleListener listener = new BundleListener() {
-
-			@Override
-			public void bundleChanged(BundleEvent event) {
-				if (matches.test(event)) {
-					events.add(event);
-					conditionLatch.countDown();
-				}
-			}
-		};
-		addBundleListenerDelegate(listener);
-		return new AbstractObservator<List<BundleEvent>>() {
-
-			@Override
-			protected List<BundleEvent> get() {
-				return events;
-			}
-
-			@Override
-			protected void cleanUp() {
-				removeBundleListenerDelegate(listener);
-			}
-
-			@Override
-			CountDownLatch countDownLatch() {
-				return conditionLatch;
-			}
-		};
+	public Observer<List<BundleEvent>> newBundleEventObervator(Predicate<BundleEvent> matches, int count,
+		boolean immidiate) {
+		return new BundleEventObserver(this, matches, count, immidiate);
 	}
 
 	@Override
-	public EventObservator<List<FrameworkEvent>> newFrameworkEventObervator(Predicate<FrameworkEvent> matches,
-		int count) {
-		CountDownLatch conditionLatch = new CountDownLatch(count);
-		List<FrameworkEvent> events = Collections.synchronizedList(new ArrayList<>());
-		FrameworkListener listener = new FrameworkListener() {
-
-			@Override
-			public void frameworkEvent(FrameworkEvent event) {
-				if (matches.test(event)) {
-					events.add(event);
-					conditionLatch.countDown();
-				}
-			}
-		};
-
-		addFrameworkListenerDelegate(listener);
-		return new AbstractObservator<List<FrameworkEvent>>() {
-
-			@Override
-			protected List<FrameworkEvent> get() {
-				return events;
-			}
-
-			@Override
-			protected void cleanUp() {
-				removeFrameworkListenerDelegate(listener);
-			}
-
-			@Override
-			CountDownLatch countDownLatch() {
-				return conditionLatch;
-			}
-		};
+	public Observer<List<FrameworkEvent>> newFrameworkEventObervator(Predicate<FrameworkEvent> matches, int count,
+		boolean immidiate) {
+		return new FrameworkEventObserver(this, matches, count, immidiate);
 	}
 
 	@Override
-	public EventObservator<List<ServiceEvent>> newServiceEventObervator(Predicate<ServiceEvent> matches, int count) {
-		CountDownLatch conditionLatch = new CountDownLatch(count);
-		List<ServiceEvent> events = Collections.synchronizedList(new ArrayList<>());
-		ServiceListener listener = new ServiceListener() {
+	public Observer<List<ServiceEvent>> newServiceEventObervator(Predicate<ServiceEvent> matches, int count,
+		boolean immidiate) {
+		return new ServiceEventObserver(this, matches, count, immidiate);
+	}
 
-			@Override
-			public void serviceChanged(ServiceEvent event) {
-				if (matches.test(event)) {
-					events.add(event);
-					conditionLatch.countDown();
-				}
-
-			}
-		};
-
-		addServiceListenerDelegate(listener);
-		return new AbstractObservator<List<ServiceEvent>>() {
-
-			@Override
-			protected List<ServiceEvent> get() {
-				return events;
-			}
-
-			@Override
-			protected void cleanUp() {
-				removeServiceListenerDelegate(listener);
-			}
-
-			@Override
-			CountDownLatch countDownLatch() {
-				return conditionLatch;
-			}
-		};
+	@Override
+	public <T> Observer<ServiceReferenceData<T>> newServiceReferenceObervator(Filter filter,
+		Predicate<ServiceTracker<T, T>> matches, boolean immidiate) {
+		return new ServiceReferenceObservator<T>(bundleContext, filter, matches,
+			immidiate);
 	}
 
 }

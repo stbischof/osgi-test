@@ -1,4 +1,4 @@
-package org.osgi.test.junit5.event;
+package org.osgi.test.junit5.event.store;
 
 import java.util.EventObject;
 import java.util.List;
@@ -7,11 +7,14 @@ import java.util.stream.Stream;
 
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
+import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.test.junit5.event.store.ServiceReferenceObservator.ServiceReferenceData;
+import org.osgi.util.tracker.ServiceTracker;
 
 public interface EventStore {
 
@@ -57,10 +60,15 @@ public interface EventStore {
 
 	boolean removeServiceListenerDelegate(ServiceListener delegate);
 
-	EventObservator<List<BundleEvent>> newBundleEventObervator(Predicate<BundleEvent> matches, int count);
+	Observer<List<BundleEvent>> newBundleEventObervator(Predicate<BundleEvent> matches, int count, boolean immidiate);
 
-	EventObservator<List<FrameworkEvent>> newFrameworkEventObervator(Predicate<FrameworkEvent> matches, int count);
+	Observer<List<FrameworkEvent>> newFrameworkEventObervator(Predicate<FrameworkEvent> matches, int count,
+		boolean immidiate);
 
-	EventObservator<List<ServiceEvent>> newServiceEventObervator(Predicate<ServiceEvent> matches, int count);
+	Observer<List<ServiceEvent>> newServiceEventObervator(Predicate<ServiceEvent> matches, int count,
+		boolean immidiate);
+
+	<T> Observer<ServiceReferenceData<T>> newServiceReferenceObervator(Filter filter,
+		Predicate<ServiceTracker<T, T>> matches, boolean immidiate);
 
 }

@@ -18,6 +18,7 @@ package org.osgi.test.junit5.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.test.common.annotation.InjectBundleContext;
@@ -35,7 +37,11 @@ import org.osgi.test.common.annotation.InjectInstallBundle;
 import org.osgi.test.common.dictionary.Dictionaries;
 import org.osgi.test.common.install.InstallBundle;
 import org.osgi.test.junit5.context.BundleContextExtension;
-import org.osgi.test.junit5.event.EventObservator.Result;
+import org.osgi.test.junit5.event.store.EventStore;
+import org.osgi.test.junit5.event.store.Observer;
+import org.osgi.test.junit5.event.store.Observer.Result;
+import org.osgi.test.junit5.event.store.ServiceReferenceObservator.ServiceReferenceData;
+import org.osgi.util.tracker.ServiceTracker;
 
 @ExtendWith(BundleContextExtension.class)
 @ExtendWith(EventListenerExtension.class)
@@ -62,10 +68,8 @@ public class EventStoreTest {
 			.matches(".*") && (event.getType() & BundleEvent.INSTALLED) != 0);
 
 		// Create an Obervator with the given count and Predicate-Matcher
-		EventObservator<List<BundleEvent>> eventObservator1 = eventStore.newBundleEventObervator(matchesAnyInstalled,
-			1);
-		EventObservator<List<BundleEvent>> eventObservator2 = eventStore.newBundleEventObervator(matchesAnyInstalled,
-			2);
+		Observer<List<BundleEvent>> eventObservator1 = eventStore.newBundleEventObervator(matchesAnyInstalled, 1, true);
+		Observer<List<BundleEvent>> eventObservator2 = eventStore.newBundleEventObervator(matchesAnyInstalled, 2, true);
 
 		// installe a Bundle to get an INSTALL-Event
 		Bundle b = ib.installBundle("tb1.jar", false);
@@ -109,12 +113,11 @@ public class EventStoreTest {
 		Predicate<ServiceEvent> matchesAnyRegistered = (event) -> (event.getType() == ServiceEvent.REGISTERED);
 
 		// Create an Obervator with the given count and Predicate-Matcher
-		EventObservator<List<ServiceEvent>> eventObservator1 = eventStore.newServiceEventObervator(matchesAnyRegistered,
-			1);
+		Observer<List<ServiceEvent>> eventObservator1 = eventStore.newServiceEventObervator(matchesAnyRegistered, 1,
+			true);
 
 		// register a Service to get an Event
-		ServiceRegistration<A> reg = bundleContext.registerService(A.class, new A() {},
-			Dictionaries.dictionaryOf());
+		ServiceRegistration<A> reg = bundleContext.registerService(A.class, new A() {}, Dictionaries.dictionaryOf());
 
 		// Wait for the event
 		Result<List<ServiceEvent>> result1 = eventObservator1.waitFor(2000, TimeUnit.MILLISECONDS);
@@ -136,6 +139,45 @@ public class EventStoreTest {
 			.count()).isEqualTo(0);
 
 		reg.unregister();
+	}
+
+	@Test
+	public void testObservatorServiceReference(@InjectEventListener EventStore eventStore,
+		@InjectBundleContext BundleContext bc) throws Exception {
+
+		Filter filter = bc.createFilter(String.format("(objectClass=%s)", A.class.getName()));
+
+		Predicate<ServiceTracker<A, A>> matcher = (tracker) -> {
+			return tracker.getServiceReferences() != null && tracker.getServiceReferences().length >= 2;
+		};
+
+		Observer<ServiceReferenceData<A>> observer = eventStore.newServiceReferenceObervator(filter, matcher, true);
+
+		List<ServiceRegistration<?>> regs = new ArrayList<ServiceRegistration<?>>();
+
+		for (int i = 0; i < 5; i++) {
+			Thread.sleep(10);
+			new Thread(() -> {
+				regs.add(bc.registerService(A.class, new A() {},
+					Dictionaries.dictionaryOf("a", System.currentTimeMillis())));
+			}).start();
+		}
+
+		Result<ServiceReferenceData<A>> result = observer.waitFor(200, TimeUnit.MILLISECONDS);
+		assertThat(result).isNotNull();
+		assertThat(result.isTimedOut()).isFalse();
+		assertThat(result.get()).isNotNull();
+
+		// assertThat(result.get()
+		// .getAddedCount()).isEqualTo(2);
+		assertThat(result.get()
+			.getModifiedCount()).isEqualTo(0);
+		assertThat(result.get()
+			.getRemovedCount()).isEqualTo(0);
+		assertThat(result.get()
+			.getServiceReference()).hasSize(2);
+
+		regs.forEach((r) -> r.unregister());
 	}
 
 	interface A {

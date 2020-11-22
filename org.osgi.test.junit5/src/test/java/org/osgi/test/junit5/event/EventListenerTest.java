@@ -27,6 +27,7 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.test.common.annotation.InjectEventListener;
 import org.osgi.test.junit5.context.BundleContextExtension;
+import org.osgi.test.junit5.event.store.EventStore;
 
 @ExtendWith(BundleContextExtension.class)
 @ExtendWith(EventListenerExtension.class)
