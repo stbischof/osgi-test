@@ -7,14 +7,11 @@ import java.util.stream.Stream;
 
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
-import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.osgi.test.junit5.event.store.ServiceReferenceObservator.ServiceReferenceData;
-import org.osgi.util.tracker.ServiceTracker;
 
 public interface EventStore {
 
@@ -67,8 +64,5 @@ public interface EventStore {
 
 	Observer<List<ServiceEvent>> newServiceEventObervator(Predicate<ServiceEvent> matches, int count,
 		boolean immidiate);
-
-	<T> Observer<ServiceReferenceData<T>> newServiceReferenceObervator(Filter filter,
-		Predicate<ServiceTracker<T, T>> matches, boolean immidiate);
 
 }

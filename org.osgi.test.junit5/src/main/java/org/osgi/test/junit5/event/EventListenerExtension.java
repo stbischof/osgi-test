@@ -151,8 +151,7 @@ public class EventListenerExtension implements BeforeAllCallback, BeforeEachCall
 							return m.invoke(oInstance.get());
 						}
 					}
-					if (m.getParameterCount() == 1
-						&& TestInfo.class.equals(m.getParameterTypes()[0])) {
+					if (m.getParameterCount() == 1 && TestInfo.class.equals(m.getParameterTypes()[0])) {
 						TestInfo testInfo = new TestInfo() {
 
 							@Override
@@ -196,7 +195,7 @@ public class EventListenerExtension implements BeforeAllCallback, BeforeEachCall
 		try {
 			if (targetType.getType()
 				.equals(EventStore.class)) {
-				return new EventStoreImpl(BundleContextExtension.getBundleContext(extensionContext));
+				return new EventStoreImpl();
 			}
 			Optional<Constructor<?>> oConstructor = parameterlessPublicConstructor(targetType.getType());
 			if (oConstructor.isPresent()) {

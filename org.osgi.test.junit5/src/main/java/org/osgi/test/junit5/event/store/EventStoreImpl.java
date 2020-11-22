@@ -8,17 +8,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
-import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.osgi.test.junit5.event.store.ServiceReferenceObservator.ServiceReferenceData;
-import org.osgi.util.tracker.ServiceTracker;
 
 public class EventStoreImpl implements FrameworkListener, BundleListener, ServiceListener, EventStore {
 
@@ -29,10 +25,8 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 		.synchronizedList(new CopyOnWriteArrayList<>());
 	private List<ServiceListener>	serviceListenerDelegate		= Collections
 		.synchronizedList(new CopyOnWriteArrayList<>());
-	private BundleContext			bundleContext;
 
-	public EventStoreImpl(BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
+	public EventStoreImpl() {
 		resetEvents();
 	}
 
@@ -162,13 +156,6 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 	public Observer<List<ServiceEvent>> newServiceEventObervator(Predicate<ServiceEvent> matches, int count,
 		boolean immidiate) {
 		return new ServiceEventObserver(this, matches, count, immidiate);
-	}
-
-	@Override
-	public <T> Observer<ServiceReferenceData<T>> newServiceReferenceObervator(Filter filter,
-		Predicate<ServiceTracker<T, T>> matches, boolean immidiate) {
-		return new ServiceReferenceObservator<T>(bundleContext, filter, matches,
-			immidiate);
 	}
 
 }

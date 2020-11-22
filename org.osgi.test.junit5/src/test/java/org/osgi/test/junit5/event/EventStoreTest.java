@@ -18,7 +18,6 @@ package org.osgi.test.junit5.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -28,7 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.test.common.annotation.InjectBundleContext;
@@ -40,8 +38,6 @@ import org.osgi.test.junit5.context.BundleContextExtension;
 import org.osgi.test.junit5.event.store.EventStore;
 import org.osgi.test.junit5.event.store.Observer;
 import org.osgi.test.junit5.event.store.Observer.Result;
-import org.osgi.test.junit5.event.store.ServiceReferenceObservator.ServiceReferenceData;
-import org.osgi.util.tracker.ServiceTracker;
 
 @ExtendWith(BundleContextExtension.class)
 @ExtendWith(EventListenerExtension.class)
@@ -139,40 +135,6 @@ public class EventStoreTest {
 			.count()).isEqualTo(0);
 
 		reg.unregister();
-	}
-
-	@Test
-	public void testObservatorServiceReference(@InjectEventListener EventStore eventStore,
-		@InjectBundleContext BundleContext bc) throws Exception {
-
-		Filter filter = bc.createFilter(String.format("(objectClass=%s)", A.class.getName()));
-
-		Predicate<ServiceTracker<A, A>> matcher = (tracker) -> {
-			return tracker.getServiceReferences() != null && tracker.getServiceReferences().length >= 2;
-		};
-
-		Observer<ServiceReferenceData<A>> observer = eventStore.newServiceReferenceObervator(filter, matcher, true);
-
-		List<ServiceRegistration<?>> regs = new ArrayList<ServiceRegistration<?>>();
-
-		regs.add(bc.registerService(A.class, new A() {}, Dictionaries.dictionaryOf("a", System.currentTimeMillis())));
-		regs.add(bc.registerService(A.class, new A() {}, Dictionaries.dictionaryOf("a", System.currentTimeMillis())));
-
-		Result<ServiceReferenceData<A>> result = observer.waitFor(200, TimeUnit.MILLISECONDS);
-		assertThat(result).isNotNull();
-		assertThat(result.isTimedOut()).isFalse();
-		assertThat(result.get()).isNotNull();
-
-		// assertThat(result.get()
-		// .getAddedCount()).isEqualTo(2);
-		assertThat(result.get()
-			.getModifiedCount()).isEqualTo(0);
-		assertThat(result.get()
-			.getRemovedCount()).isEqualTo(0);
-		assertThat(result.get()
-			.getServiceReference()).hasSize(2);
-
-		regs.forEach((r) -> r.unregister());
 	}
 
 	interface A {
