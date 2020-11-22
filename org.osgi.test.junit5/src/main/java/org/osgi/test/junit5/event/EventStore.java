@@ -15,23 +15,16 @@ import org.osgi.framework.ServiceReference;
 
 public interface EventStore {
 
-	static Predicate<? super BundleEvent> isBundleEventType(final int eventTypeMask) {
+	static Predicate<BundleEvent> isBundleEventType(final int eventTypeMask) {
 		return e -> (e.getType() & eventTypeMask) != 0;
 	}
 
-	static Predicate<? super FrameworkEvent> isFrameworkEventType(final int eventTypeMask) {
+	static Predicate<FrameworkEvent> isFrameworkEventType(final int eventTypeMask) {
 		return e -> (e.getType() & eventTypeMask) != 0;
 	}
 
-	static Predicate<? super ServiceEvent> isServiceEventType(final int eventTypeMask) {
+	static Predicate<ServiceEvent> isServiceEventType(final int eventTypeMask) {
 		return e -> (e.getType() & eventTypeMask) != 0;
-	}
-
-	static <T> T getLastEvent(Stream<T> stream) {
-		long count = stream.count();
-		return stream.skip(count - 1)
-			.findFirst()
-			.get();
 	}
 
 	Stream<EventObject> getEvents();

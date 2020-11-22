@@ -39,7 +39,7 @@ import org.osgi.test.junit5.event.EventObservator.Result;
 
 @ExtendWith(BundleContextExtension.class)
 @ExtendWith(EventListenerExtension.class)
-public class EventStoreImplListenerTest {
+public class EventStoreTest {
 
 	@InjectEventListener
 	static EventStore	staticEventStore;

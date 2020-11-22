@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -19,10 +20,13 @@ import org.osgi.framework.ServiceReference;
 
 public class EventStoreImpl implements FrameworkListener, BundleListener, ServiceListener, EventStore {
 
-	private List<BundleListener>	bundleListenerDelegate		= Collections.synchronizedList(new ArrayList<>());
+	private List<BundleListener>	bundleListenerDelegate		= Collections
+		.synchronizedList(new CopyOnWriteArrayList<>());
 	private List<EventObject>		events;
-	private List<FrameworkListener>	frameworkListenerDelegate	= Collections.synchronizedList(new ArrayList<>());
-	private List<ServiceListener>	serviceListenerDelegate		= Collections.synchronizedList(new ArrayList<>());
+	private List<FrameworkListener>	frameworkListenerDelegate	= Collections
+		.synchronizedList(new CopyOnWriteArrayList<>());
+	private List<ServiceListener>	serviceListenerDelegate		= Collections
+		.synchronizedList(new CopyOnWriteArrayList<>());
 
 	public EventStoreImpl() {
 		resetEvents();
@@ -105,7 +109,7 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 
 	@Override
 	public void resetEvents() {
-		events = Collections.synchronizedList(new ArrayList<EventObject>());
+		events = Collections.synchronizedList(new CopyOnWriteArrayList<EventObject>());
 	}
 
 	@Override

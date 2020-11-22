@@ -23,13 +23,16 @@ import static org.osgi.test.common.inject.FieldInjector.setField;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionConfigurationException;
@@ -147,11 +150,34 @@ public class EventListenerExtension implements BeforeAllCallback, BeforeEachCall
 						}
 					}
 					if (m.getParameterCount() == 1
-						&& ExtensionContext.class.isAssignableFrom(m.getParameterTypes()[0])) {
+						&& TestInfo.class.equals(m.getParameterTypes()[0])) {
+						TestInfo testInfo = new TestInfo() {
+
+							@Override
+							public Optional<Method> getTestMethod() {
+
+								return extensionContext.getTestMethod();
+							}
+
+							@Override
+							public Optional<Class<?>> getTestClass() {
+								return extensionContext.getTestClass();
+							}
+
+							@Override
+							public Set<String> getTags() {
+								return extensionContext.getTags();
+							}
+
+							@Override
+							public String getDisplayName() {
+								return extensionContext.getDisplayName();
+							}
+						};
 						if (Modifier.isStatic(m.getModifiers())) {
-							return m.invoke(null, extensionContext);
+							return m.invoke(null, testInfo);
 						} else if (oInstance.isPresent()) {
-							return m.invoke(oInstance.get(), extensionContext);
+							return m.invoke(oInstance.get(), testInfo);
 						}
 					}
 				} catch (Exception e) {

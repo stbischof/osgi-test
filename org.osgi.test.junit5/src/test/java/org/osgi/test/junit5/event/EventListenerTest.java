@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
@@ -81,8 +82,21 @@ public class EventListenerTest {
 			.isEqualTo(1);
 	}
 
+	@Test
+	public void testWithListenerParameterProviderMethodWithTestInfo(
+		@InjectEventListener(providerMethod = "createlistenerTestInfo") CustomListener listener) throws Exception {
+		assertThat(listener).isNotNull()
+			.extracting(l -> l.value)
+			.isEqualTo(2);
+	}
+
 	public CustomListener createlistener() {
 		return new CustomListener(1);
+	}
+
+	public CustomListener createlistenerTestInfo(TestInfo testInfo) {
+		testInfo.getTestMethod();
+		return new CustomListener(2);
 	}
 
 	static class CustomListener implements ServiceListener {
