@@ -19,17 +19,16 @@ import org.osgi.framework.ServiceReference;
 
 public class EventStoreImpl implements FrameworkListener, BundleListener, ServiceListener, EventStore {
 
-	private List<BundleListener>	bundleListenerDelegate		= new ArrayList<>();
+	private List<BundleListener>	bundleListenerDelegate		= Collections.synchronizedList(new ArrayList<>());
 	private List<EventObject>		events;
-	private List<FrameworkListener>	frameworkListenerDelegate	= new ArrayList<>();
-	private List<ServiceListener>	serviceListenerDelegate		= new ArrayList<>();
+	private List<FrameworkListener>	frameworkListenerDelegate	= Collections.synchronizedList(new ArrayList<>());
+	private List<ServiceListener>	serviceListenerDelegate		= Collections.synchronizedList(new ArrayList<>());
 
 	public EventStoreImpl() {
 		resetEvents();
 	}
 
 	private void event(final EventObject event) {
-
 		events.add(event);
 	}
 
@@ -70,8 +69,8 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 	}
 
 	@Override
-	public Stream<BundleEvent> getEventsBundle(final int eventType) {
-		return getEventsBundle().filter(EventStore.isBundleEventType(eventType));
+	public Stream<BundleEvent> getEventsBundle(final int eventTypeMask) {
+		return getEventsBundle().filter(EventStore.isBundleEventType(eventTypeMask));
 	}
 
 	@Override
@@ -80,8 +79,8 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 	}
 
 	@Override
-	public Stream<FrameworkEvent> getEventsFramework(final int eventType) {
-		return getEventsFramework().filter(EventStore.isFrameworkEventType(eventType));
+	public Stream<FrameworkEvent> getEventsFramework(final int eventTypeMask) {
+		return getEventsFramework().filter(EventStore.isFrameworkEventType(eventTypeMask));
 	}
 
 	@Override
@@ -90,12 +89,12 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 	}
 
 	@Override
-	public Stream<ServiceEvent> getEventsService(final int eventType) {
-		return getEventsService().filter(EventStore.isServiceEventType(eventType));
+	public Stream<ServiceEvent> getEventsService(final int eventTypeMask) {
+		return getEventsService().filter(EventStore.isServiceEventType(eventTypeMask));
 	}
 
 	@Override
-	public Stream<ServiceEvent> getEventsService(ServiceReference<?> serviceReference, final int eventType) {
+	public Stream<ServiceEvent> getEventsService(ServiceReference<?> serviceReference, final int eventTypeMask) {
 		return getEventsService().filter(isServiceReference(serviceReference));
 	}
 
@@ -158,14 +157,12 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 
 			@Override
 			protected List<BundleEvent> get() {
-
 				return events;
 			}
 
 			@Override
 			protected void cleanUp() {
 				removeBundleListenerDelegate(listener);
-
 			}
 
 			@Override
@@ -184,7 +181,6 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 
 			@Override
 			public void frameworkEvent(FrameworkEvent event) {
-
 				if (matches.test(event)) {
 					events.add(event);
 					conditionLatch.countDown();
@@ -197,14 +193,12 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 
 			@Override
 			protected List<FrameworkEvent> get() {
-
 				return events;
 			}
 
 			@Override
 			protected void cleanUp() {
 				removeFrameworkListenerDelegate(listener);
-
 			}
 
 			@Override
@@ -235,7 +229,6 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 
 			@Override
 			protected List<ServiceEvent> get() {
-
 				return events;
 			}
 

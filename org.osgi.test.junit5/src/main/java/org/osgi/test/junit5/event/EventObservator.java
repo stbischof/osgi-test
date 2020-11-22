@@ -9,7 +9,7 @@ public interface EventObservator<T> {
 	Result<T> waitFor();
 
 	interface Result<E> {
-		boolean isValid();
+		boolean isTimedOut();
 
 		E get();
 	}

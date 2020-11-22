@@ -16,16 +16,13 @@ public abstract class AbstractObservator<T> implements EventObservator<T> {
 	public Result<T> waitFor(long timeout, TimeUnit timeUnit) {
 		try {
 			boolean ok = countDownLatch().await(timeout, timeUnit);
-
-			return new DefaultResult<T>(ok, get());
+			return new DefaultResult<T>(!ok, get());
 		} catch (InterruptedException e) {
 			Exceptions.unchecked(() -> e);
 		} finally {
 			cleanUp();
 		}
-		// Unreachble
-		return null;
-
+		throw new AssertionError("unreachable");
 	}
 
 	protected abstract T get();
@@ -35,17 +32,17 @@ public abstract class AbstractObservator<T> implements EventObservator<T> {
 	abstract CountDownLatch countDownLatch();
 
 	class DefaultResult<E> implements Result<E> {
+		private boolean	timedOut;
 		private E		events;
-		private boolean	valid;
 
-		public DefaultResult(boolean valid, E events) {
-			this.valid = valid;
-			this.events = events;
+		public DefaultResult(boolean timedOut, E objects) {
+			this.timedOut = timedOut;
+			this.events = objects;
 		}
 
 		@Override
-		public boolean isValid() {
-			return valid;
+		public boolean isTimedOut() {
+			return timedOut;
 		}
 
 		@Override
