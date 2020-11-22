@@ -51,7 +51,7 @@ public class EventStoreImplTest {
 	public void beforeEachTest(@InjectBundleContext BundleContext bc) {
 
 		this.bundle = bc.getBundle();
-		store = new EventStoreImpl(bc);
+		store = new EventStoreImpl();
 		// All clear
 		assertThat(store.getEvents()
 			.count()).isEqualTo(0);
