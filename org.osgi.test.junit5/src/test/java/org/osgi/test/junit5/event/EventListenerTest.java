@@ -95,7 +95,13 @@ public class EventListenerTest {
 	}
 
 	public CustomListener createlistenerTestInfo(TestInfo testInfo) {
-		testInfo.getTestMethod();
+		assertThat(testInfo).isNotNull();
+		assertThat(testInfo.getTestMethod()).isNotNull()
+			.isPresent();
+		assertThat(testInfo.getDisplayName()).isNotNull();
+		assertThat(testInfo.getTags()).isNotNull();
+		assertThat(testInfo.getTestClass()).isNotNull()
+			.isNotNull();
 		return new CustomListener(2);
 	}
 
