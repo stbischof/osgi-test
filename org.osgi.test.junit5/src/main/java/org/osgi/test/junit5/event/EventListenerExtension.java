@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.osgi.test.junit5.listener;
+package org.osgi.test.junit5.event;
 
 import static org.osgi.test.common.inject.FieldInjector.findAnnotatedFields;
 import static org.osgi.test.common.inject.FieldInjector.findAnnotatedNonStaticFields;
@@ -45,75 +45,57 @@ import org.osgi.framework.BundleListener;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceListener;
-import org.osgi.test.common.annotation.InjectListener;
+import org.osgi.test.common.annotation.InjectEventListener;
 import org.osgi.test.common.inject.TargetType;
 import org.osgi.test.junit5.context.BundleContextExtension;
 
-public class ListenerExtension implements BeforeAllCallback, BeforeEachCallback, ParameterResolver {
-
+public class EventListenerExtension implements BeforeAllCallback, BeforeEachCallback, ParameterResolver {
 	@Override
 	public void beforeAll(ExtensionContext extensionContext) throws Exception {
-
-		List<Field> fields = findAnnotatedFields(extensionContext.getRequiredTestClass(), InjectListener.class,
+		List<Field> fields = findAnnotatedFields(extensionContext.getRequiredTestClass(), InjectEventListener.class,
 			m -> Modifier.isStatic(m.getModifiers()));
-
 		fields.forEach(field -> {
 			assertValidFieldCandidate(field);
-
-			InjectListener injectListener = field.getAnnotation(InjectListener.class);
-
+			InjectEventListener injectListener = field.getAnnotation(InjectEventListener.class);
 			TargetType targetType = TargetType.of(field);
-			setField(field, null, resolveInjectListenerReturnValue(targetType, injectListener, extensionContext));
+			setField(field, null, resolveInjectEventListenerReturnValue(targetType, injectListener, extensionContext));
 		});
 	}
 
 	@Override
 	public void beforeEach(ExtensionContext extensionContext) throws Exception {
-
 		for (Object instance : extensionContext.getRequiredTestInstances()
 			.getAllInstances()) {
-			List<Field> fields = findAnnotatedNonStaticFields(instance.getClass(), InjectListener.class);
-
+			List<Field> fields = findAnnotatedNonStaticFields(instance.getClass(), InjectEventListener.class);
 			fields.forEach(field -> {
 				assertValidFieldCandidate(field);
-				InjectListener injectListener = field.getAnnotation(InjectListener.class);
+				InjectEventListener injectListener = field.getAnnotation(InjectEventListener.class);
 				TargetType targetType = TargetType.of(field);
 				setField(field, instance,
-					resolveInjectListenerReturnValue(targetType, injectListener, extensionContext));
+					resolveInjectEventListenerReturnValue(targetType, injectListener, extensionContext));
 			});
-
 		}
 	}
 
 	@Override
 	public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
 		throws ParameterResolutionException {
-
 		Parameter parameter = parameterContext.getParameter();
 		TargetType targetType = TargetType.of(parameter);
-
-		Optional<InjectListener> injectListener = parameterContext.findAnnotation(InjectListener.class);
+		Optional<InjectEventListener> injectListener = parameterContext.findAnnotation(InjectEventListener.class);
 		if (injectListener.isPresent()) {
-			return resolveInjectListenerReturnValue(targetType, injectListener.get(), extensionContext);
+			return resolveInjectEventListenerReturnValue(targetType, injectListener.get(), extensionContext);
 		}
 		throw new ParameterResolutionException("Unspported Parameter");
-
 	}
 
-	/**
-	 * @param targetType
-	 * @param extensionContext
-	 * @param injectListener
-	 * @return
-	 */
-	private Object resolveInjectListenerReturnValue(TargetType targetType, InjectListener injectListener,
+	private Object resolveInjectEventListenerReturnValue(TargetType targetType, InjectEventListener injectListener,
 		ExtensionContext extensionContext) {
 		String providerMethod = injectListener.providerMethod();
 		Object listener = null;
 		if (providerMethod.isEmpty()) {
 			listener = serviceListenerFromTargetClass(targetType, injectListener, extensionContext);
 		} else {
-
 			Optional<Object> oInstance = extensionContext.getTestInstance();
 			if (oInstance.isPresent()) {
 				listener = invokeServiceListener(extensionContext, providerMethod, oInstance.get()
@@ -124,15 +106,12 @@ public class ListenerExtension implements BeforeAllCallback, BeforeEachCallback,
 					listener = invokeServiceListener(extensionContext, providerMethod, oClass.get(), Optional.empty());
 				}
 			}
-
 		}
-
 		BundleContext bc = BundleContextExtension.getBundleContext(extensionContext);
 		try {
 			if (listener instanceof ServiceListener) {
 				String filter = injectListener.filter()
 					.isEmpty() ? null : injectListener.filter();
-
 				bc.addServiceListener((ServiceListener) listener, filter);
 			}
 			if (listener instanceof BundleListener) {
@@ -145,24 +124,14 @@ public class ListenerExtension implements BeforeAllCallback, BeforeEachCallback,
 			throw new ParameterResolutionException(
 				String.format("Wrong filter-syntax in @injectListener", targetType.getType()));
 		}
-
 		final Object fListener = listener;
 		getStore(extensionContext).getOrComputeIfAbsent(UUID.randomUUID(),
 			uuid -> new CloseableServiceListener(bc, fListener));
 		return fListener;
-
 	}
 
-	/**
-	 * @param extensionContext
-	 * @param providerMethod
-	 * @param oInstance
-	 * @param methods
-	 * @return
-	 */
 	private Object invokeServiceListener(ExtensionContext extensionContext, String providerMethod, Class<?> clazz,
 		Optional<Object> oInstance) {
-
 		Optional<Object> listener = Stream.of(clazz.getMethods())
 			.filter(m -> !Modifier.isAbstract(m.getModifiers()))
 			.filter(m -> m.getName()
@@ -194,28 +163,21 @@ public class ListenerExtension implements BeforeAllCallback, BeforeEachCallback,
 			String.format("No provider-method with name `%s` found.", providerMethod)));
 	}
 
-	/**
-	 * @param targetType
-	 * @param injectListener
-	 * @param extensionContext
-	 * @return
-	 */
-	private Object serviceListenerFromTargetClass(TargetType targetType, InjectListener injectListener,
+	private Object serviceListenerFromTargetClass(TargetType targetType, InjectEventListener injectListener,
 		ExtensionContext extensionContext) {
 		try {
-
+			if (targetType.getType()
+				.equals(EventStore.class)) {
+				return new EventStoreImpl();
+			}
 			Optional<Constructor<?>> oConstructor = parameterlessPublicConstructor(targetType.getType());
-
 			if (oConstructor.isPresent()) {
-
 				Object listener = oConstructor.get()
 					.newInstance();
-
 				return listener;
 			}
 			throw new ParameterResolutionException(
 				String.format("The class `%s` has no public no-arg Constructor ", targetType.getType()));
-
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 			| InvocationTargetException e) {
 			throw new ParameterResolutionException(
@@ -227,23 +189,23 @@ public class ListenerExtension implements BeforeAllCallback, BeforeEachCallback,
 	@Override
 	public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
 		throws ParameterResolutionException {
-		Optional<InjectListener> oAnn = parameterContext.findAnnotation(InjectListener.class);
+		Optional<InjectEventListener> oAnn = parameterContext.findAnnotation(InjectEventListener.class);
 		if (oAnn.isPresent()) {
-			InjectListener injectListener = oAnn.get();
+			InjectEventListener injectListener = oAnn.get();
 			TargetType targetType = TargetType.of(parameterContext.getParameter());
-			if (!injectListener.providerMethod()
-				.isEmpty() || parameterlessPublicConstructor(targetType.getType()).isPresent()) {
+			if (targetType.getType()
+				.equals(EventStore.class)
+				|| !injectListener.providerMethod()
+					.isEmpty()
+				|| parameterlessPublicConstructor(targetType.getType()).isPresent()) {
 				return true;
 			}
 		}
 		return false;
-
 	}
 
 	private Optional<Constructor<?>> parameterlessPublicConstructor(Class<?> clazz) {
-
 		for (Constructor<?> constructor : clazz.getConstructors()) {
-
 			if (constructor.getParameterCount() == 0) {
 				return Optional.of(constructor);
 			}
@@ -253,17 +215,17 @@ public class ListenerExtension implements BeforeAllCallback, BeforeEachCallback,
 
 	static void assertValidFieldCandidate(Field field) {
 		if (Modifier.isFinal(field.getModifiers()) || Modifier.isPrivate(field.getModifiers())) {
-			throw new ExtensionConfigurationException("@" + InjectListener.class.getSimpleName() + " field ["
+			throw new ExtensionConfigurationException("@" + InjectEventListener.class.getSimpleName() + " field ["
 				+ field.getName() + "] must not be final or private.");
 		}
 	}
 
 	static Store getStore(ExtensionContext extensionContext) {
-		return extensionContext.getStore(Namespace.create(ListenerExtension.class, extensionContext.getUniqueId()));
+		return extensionContext
+			.getStore(Namespace.create(EventListenerExtension.class, extensionContext.getUniqueId()));
 	}
 
 	public static class CloseableServiceListener implements CloseableResource {
-
 		private final Object		listener;
 		private final BundleContext	bundleContext;
 
@@ -284,6 +246,5 @@ public class ListenerExtension implements BeforeAllCallback, BeforeEachCallback,
 				bundleContext.removeFrameworkListener((FrameworkListener) listener);
 			}
 		}
-
 	}
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.osgi.test.junit5.listener;
+package org.osgi.test.junit5.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,41 +24,58 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
-import org.osgi.test.common.annotation.InjectListener;
+import org.osgi.test.common.annotation.InjectEventListener;
 import org.osgi.test.junit5.context.BundleContextExtension;
 
 @ExtendWith(BundleContextExtension.class)
-@ExtendWith(ListenerExtension.class)
-public class ListenerTest {
+@ExtendWith(EventListenerExtension.class)
+public class EventListenerTest {
 
-	@InjectListener
-	static CustomListener	staticlistener;
-	@InjectListener
+	@InjectEventListener
+	static CustomListener	staticListener;
+	@InjectEventListener
 	CustomListener			listener;
+
+	@InjectEventListener
+	static EventStore		staticEventStore;
+
+	@InjectEventListener
+	EventStore				eventStore;
 
 	@BeforeAll
 	public static void beforeAll() throws Exception {
-		assertThat(staticlistener).isNotNull();
+		assertThat(staticListener).isNotNull();
 	}
 
 	@BeforeEach
 	public void beforeEach() throws Exception {
+		assertThat(staticListener).isNotNull();
 		assertThat(listener).isNotNull();
 	}
 
 	@Test
-	public void testWithLogServiceField() throws Exception {
+	public void testWithField() throws Exception {
+		assertThat(staticListener).isNotNull();
 		assertThat(listener).isNotNull();
+		assertThat(staticEventStore).isNotNull();
+		assertThat(eventStore).isNotNull();
 	}
 
 	@Test
-	public void testWithlistenerParameter(@InjectListener CustomListener listener) throws Exception {
-		assertThat(listener).isNotNull();
+	public void testWithEventStoreParameter(@InjectEventListener EventStore eventStore) throws Exception {
+		assertThat(eventStore).isNotNull();
 	}
 
 	@Test
-	public void testWithlistenerParameterProvicerMethod(
-		@InjectListener(providerMethod = "createlistener") CustomListener listener) throws Exception {
+	public void testWithListenerParameter(@InjectEventListener CustomListener listener) throws Exception {
+		assertThat(listener).isNotNull()
+			.extracting(l -> l.value)
+			.isEqualTo(0);
+	}
+
+	@Test
+	public void testWithListenerParameterProviderMethod(
+		@InjectEventListener(providerMethod = "createlistener") CustomListener listener) throws Exception {
 		assertThat(listener).isNotNull()
 			.extracting(l -> l.value)
 			.isEqualTo(1);

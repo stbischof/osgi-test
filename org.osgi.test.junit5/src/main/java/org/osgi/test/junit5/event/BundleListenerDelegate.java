@@ -1,8 +1,9 @@
-package org.osgi.test.junit5.listener;
+package org.osgi.test.junit5.event;
 
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.BundleListener;
 
-public interface BundleDelegate {
+public interface BundleListenerDelegate extends BundleListener {
 
 	void bundleUpdated(BundleEvent event);
 
@@ -24,6 +25,7 @@ public interface BundleDelegate {
 
 	void bundleInstalled(BundleEvent event);
 
+	@Override
 	default void bundleChanged(BundleEvent event) {
 		switch (event.getType()) {
 			case BundleEvent.INSTALLED :

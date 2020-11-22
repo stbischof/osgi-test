@@ -1,8 +1,9 @@
-package org.osgi.test.junit5.listener;
+package org.osgi.test.junit5.event;
 
 import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.FrameworkListener;
 
-public interface FrameworkDelegate {
+public interface FrameworkListenerDelegate extends FrameworkListener {
 
 	void frameworkWarning(FrameworkEvent event);
 
@@ -24,6 +25,7 @@ public interface FrameworkDelegate {
 
 	void frameworkError(FrameworkEvent event);
 
+	@Override
 	default void frameworkEvent(FrameworkEvent event) {
 		switch (event.getType()) {
 			case FrameworkEvent.ERROR :

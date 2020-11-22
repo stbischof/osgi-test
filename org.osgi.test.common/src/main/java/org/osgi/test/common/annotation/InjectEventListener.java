@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
 })
 @Retention(RUNTIME)
 @Documented
-public @interface InjectListener {
+public @interface InjectEventListener {
 	/**
 	 * Filter string used to target more specific services using the
 	 * {@code String.format} pattern. Must use valid OSGi filter syntax.

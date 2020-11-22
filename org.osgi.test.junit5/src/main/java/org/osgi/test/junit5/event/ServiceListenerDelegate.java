@@ -1,8 +1,9 @@
-package org.osgi.test.junit5.listener;
+package org.osgi.test.junit5.event;
 
 import org.osgi.framework.ServiceEvent;
+import org.osgi.framework.ServiceListener;
 
-public interface ServiceDelegate {
+public interface ServiceListenerDelegate extends ServiceListener {
 
 	void serviceUnregisterEvent(ServiceEvent event);
 
@@ -12,6 +13,7 @@ public interface ServiceDelegate {
 
 	void serviceRegisterEvent(ServiceEvent event);
 
+	@Override
 	default void serviceChanged(ServiceEvent event) {
 		switch (event.getType()) {
 			case ServiceEvent.REGISTERED :
