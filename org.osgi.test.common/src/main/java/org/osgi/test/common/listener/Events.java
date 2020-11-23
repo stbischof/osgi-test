@@ -100,31 +100,90 @@ public class Events {
 		return isServiceEventWith(ServiceEvent.MODIFIED_ENDMATCH, objectClass);
 	}
 
+	/**
+	 * {@link Observer} that will waitFor for a single matching Event.
+	 *
+	 * @param bundleContext - the Observer will add and remove a listener.
+	 * @param matches - Predicate that would be tested against the Events
+	 * @param immidiate - true start the Observer immediately. Could also be
+	 *            started later using start or waitFor method.
+	 * @return Observer<BundleEvent>
+	 */
 	public static Observer<BundleEvent> newBundleEventObserver(BundleContext bundleContext,
 		Predicate<BundleEvent> matches, boolean immidiate) {
 		return new BundleEventObserverSingle(bundleContext, matches, immidiate);
 	}
 
+	/**
+	 * {@link Observer} that will waitFor for multiple matching Event.
+	 *
+	 * @param bundleContext - the Observer will add and remove a listener.
+	 * @param matches - Predicate that would be tested against the Events
+	 * @param count - the among of matching events the Observer is waitFor
+	 * @param immidiate - true start the Observer immediately. Could also be
+	 *            started later using start or waitFor method.
+	 * @return Observer<BundleEvent>
+	 */
 	public static Observer<List<BundleEvent>> newBundleEventObserver(BundleContext bundleContext,
 		Predicate<BundleEvent> matches, int count, boolean immidiate) {
 		return new BundleEventObserverMulti(bundleContext, matches, count, immidiate);
 	}
+
+	/**
+	 * {@link Observer} that will waitFor for a single matching Event.
+	 *
+	 * @param bundleContext - the Observer will add and remove a listener.
+	 * @param matches - Predicate that would be tested against the Events
+	 * @param immidiate - true start the Observer immediately. Could also be
+	 *            started later using start or waitFor method.
+	 * @return Observer<BundleEvent>
+	 */
 
 	public static Observer<FrameworkEvent> newFrameworkEventObserver(BundleContext bundleContext,
 		Predicate<FrameworkEvent> matches, boolean immidiate) {
 		return new FrameworkEventObserverSingle(bundleContext, matches, immidiate);
 	}
 
+	/**
+	 * {@link Observer} that will waitFor for multiple matching Event.
+	 *
+	 * @param bundleContext - the Observer will add and remove a listener.
+	 * @param matches - Predicate that would be tested against the Events
+	 * @param count - the among of matching events the Observer is waitFor
+	 * @param immidiate - true start the Observer immediately. Could also be
+	 *            started later using start or waitFor method.
+	 * @return Observer<BundleEvent>
+	 */
 	public static Observer<List<FrameworkEvent>> newFrameworkEventObserver(BundleContext bundleContext,
 		Predicate<FrameworkEvent> matches, int count, boolean immidiate) {
 		return new FrameworkEventObserverMulti(bundleContext, matches, count, immidiate);
 	}
+
+	/**
+	 * {@link Observer} that will waitFor for a single matching Event.
+	 *
+	 * @param bundleContext - the Observer will add and remove a listener.
+	 * @param matches - Predicate that would be tested against the Events
+	 * @param immidiate - true start the Observer immediately. Could also be
+	 *            started later using start or waitFor method.
+	 * @return Observer<BundleEvent>
+	 */
 
 	public static Observer<ServiceEvent> newServiceEventObserver(BundleContext bundleContext,
 		Predicate<ServiceEvent> matches, boolean immidiate) {
 		return new ServiceEventObserverSingle(bundleContext, matches, immidiate);
 	}
 
+	/**
+	 * {@link Observer} that will waitFor for multiple matching Event.
+	 *
+	 * @param bundleContext - the Observer will add and remove a listener.
+	 * @param matches - Predicate that would be tested against the Events
+	 * @param count - the among of matching events the Observer is waitFor
+	 * @param immidiate - true start the Observer immediately. Could also be
+	 *            started later using start or waitFor method.
+	 * @return Observer<BundleEvent>
+	 */
 	public static Observer<List<ServiceEvent>> newServiceEventObserver(BundleContext bundleContext,
 		Predicate<ServiceEvent> matches, int count, boolean immidiate) {
 		return new ServiceEventObserverMulti(bundleContext, matches, count, immidiate);
