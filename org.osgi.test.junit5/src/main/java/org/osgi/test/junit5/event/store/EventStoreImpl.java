@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -92,7 +93,7 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 
 	@Override
 	public Stream<ServiceEvent> getEventsService(final int eventTypeMask) {
-		return getEventsService().filter(EventStore.isServiceEventType(eventTypeMask));
+		return getEventsService().filter(EventStore.serviceEventType(eventTypeMask));
 	}
 
 	@Override
@@ -156,6 +157,12 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 	public Observer<List<ServiceEvent>> newServiceEventObervator(Predicate<ServiceEvent> matches, int count,
 		boolean immidiate) {
 		return new ServiceEventObserver(this, matches, count, immidiate);
+	}
+
+	@Override
+	public Observer<Optional<ServiceReference<?>>> newSingleServiceEventObervator(Predicate<ServiceEvent> matches,
+		boolean immidiate) {
+		return new ServiceEventObserverSingleton(this, matches, immidiate);
 	}
 
 }

@@ -163,7 +163,7 @@ public class EventStoreImplTest {
 
 		// Create Observer that catches Events
 		Observer<List<ServiceEvent>> observator = store
-			.newServiceEventObervator(EventStore.isServiceEventType(ServiceEvent.REGISTERED), 1, true);
+			.newServiceEventObervator(EventStore.serviceEventType(ServiceEvent.REGISTERED), 1, true);
 
 		// Create and fire event
 		ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, sr);
