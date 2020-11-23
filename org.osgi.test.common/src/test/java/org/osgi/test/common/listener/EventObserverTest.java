@@ -143,7 +143,7 @@ public class EventObserverTest {
 	@Test
 	public void testObservatorFramework() throws Exception {
 
-		// Test any Match on SymbolicName and INSTALL-Event
+		// Test any Match
 		Predicate<FrameworkEvent> matches = (event) -> event.getType() == FrameworkEvent.STOPPED;
 
 		// Create an Obervator with the given count and Predicate-Matcher
@@ -181,7 +181,7 @@ public class EventObserverTest {
 	@Test
 	public void testObservatorService() throws Exception {
 
-		// Test any Match on SymbolicName and INSTALL-Event
+		// Test any Match
 		Predicate<ServiceEvent> matches = (event) -> event.getType() == ServiceEvent.REGISTERED;
 
 		// Create an Obervator with the given count and Predicate-Matcher

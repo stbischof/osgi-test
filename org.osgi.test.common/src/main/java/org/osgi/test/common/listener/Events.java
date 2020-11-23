@@ -36,19 +36,19 @@ public class Events {
 		return e -> (e.getType() & eventTypeMask) != 0;
 	}
 
-	public static Predicate<ServiceEvent> serviceEventType(final int eventTypeMask) {
+	public static Predicate<ServiceEvent> isServiceEventType(final int eventTypeMask) {
 		return e -> (e.getType() & eventTypeMask) != 0;
 	}
 
-	public static Predicate<ServiceEvent> serviceObjectClass(final Class<?> clazz) {
-		return e -> servicePropertiesContains(Constants.OBJECTCLASS, clazz.getName()).test(e);
+	public static Predicate<ServiceEvent> hasServiceObjectClass(final Class<?> objectClass) {
+		return e -> containsServiceProperty(Constants.OBJECTCLASS, objectClass.getName()).test(e);
 	}
 
-	public static Predicate<ServiceEvent> servicePropertiesContains(final String key, Object value) {
-		return e -> servicePropertiesContains(Dictionaries.dictionaryOf(key, value)).test(e);
+	public static Predicate<ServiceEvent> containsServiceProperty(final String key, Object value) {
+		return e -> containsServiceProperties(Dictionaries.dictionaryOf(key, value)).test(e);
 	}
 
-	public static Predicate<ServiceEvent> servicePropertiesContains(Map<String, Object> map) {
+	public static Predicate<ServiceEvent> containsServiceProperties(Map<String, Object> map) {
 		return e -> {
 			ServiceReference<?> sr = e.getServiceReference();
 			List<String> keys = Stream.of(sr.getPropertyKeys())
@@ -65,41 +65,39 @@ public class Events {
 		};
 	}
 
-	public static Predicate<ServiceEvent> servicePropertiesContains(Dictionary<String, Object> dictionary) {
-		return e -> servicePropertiesContains(Dictionaries.asMap(dictionary)).test(e);
+	public static Predicate<ServiceEvent> containsServiceProperties(Dictionary<String, Object> dictionary) {
+		return e -> containsServiceProperties(Dictionaries.asMap(dictionary)).test(e);
 	}
 
-	public static Predicate<ServiceEvent> serviceEventWith(int eventTypeMask, final Class<?> clazz) {
-		return e -> serviceEventType(eventTypeMask).test(e) && (serviceObjectClass(clazz).test(e));
+	public static Predicate<ServiceEvent> isServiceEventWith(int eventTypeMask, final Class<?> objectClass) {
+		return e -> isServiceEventType(eventTypeMask).test(e) && (hasServiceObjectClass(objectClass).test(e));
 	}
 
-	public static Predicate<ServiceEvent> serviceEventWith(int eventTypeMask, final Class<?> clazz,
+	public static Predicate<ServiceEvent> isServiceEventWith(int eventTypeMask, final Class<?> objectClass,
 		Map<String, Object> map) {
-		return e -> serviceEventType(eventTypeMask).test(e) && (serviceObjectClass(clazz).test(e))
-			&& servicePropertiesContains(map).test(e);
-
+		return e -> isServiceEventType(eventTypeMask).test(e) && (hasServiceObjectClass(objectClass).test(e))
+			&& containsServiceProperties(map).test(e);
 	}
 
-	public static Predicate<ServiceEvent> serviceEventWith(int eventTypeMask, final Class<?> clazz,
+	public static Predicate<ServiceEvent> isServiceEventWith(int eventTypeMask, final Class<?> objectClass,
 		Dictionary<String, Object> dictionary) {
-		return e -> serviceEventWith(eventTypeMask, clazz, Dictionaries.asMap(dictionary)).test(e);
-
+		return e -> isServiceEventWith(eventTypeMask, objectClass, Dictionaries.asMap(dictionary)).test(e);
 	}
 
-	public static Predicate<ServiceEvent> serviceRegistered(final Class<?> clazz) {
-		return serviceEventWith(ServiceEvent.REGISTERED, clazz);
+	public static Predicate<ServiceEvent> isServiceRegistered(final Class<?> objectClass) {
+		return isServiceEventWith(ServiceEvent.REGISTERED, objectClass);
 	}
 
-	public static Predicate<ServiceEvent> serviceUnregistering(final Class<?> clazz) {
-		return serviceEventWith(ServiceEvent.UNREGISTERING, clazz);
+	public static Predicate<ServiceEvent> isServiceUnregistering(final Class<?> objectClass) {
+		return isServiceEventWith(ServiceEvent.UNREGISTERING, objectClass);
 	}
 
-	public static Predicate<ServiceEvent> serviceModified(final Class<?> clazz) {
-		return serviceEventWith(ServiceEvent.MODIFIED, clazz);
+	public static Predicate<ServiceEvent> isServiceModified(final Class<?> objectClass) {
+		return isServiceEventWith(ServiceEvent.MODIFIED, objectClass);
 	}
 
-	public static Predicate<ServiceEvent> serviceModifiedEndmatch(final Class<?> clazz) {
-		return serviceEventWith(ServiceEvent.MODIFIED_ENDMATCH, clazz);
+	public static Predicate<ServiceEvent> isServiceModifiedEndmatch(final Class<?> objectClass) {
+		return isServiceEventWith(ServiceEvent.MODIFIED_ENDMATCH, objectClass);
 	}
 
 	public static Observer<BundleEvent> newBundleEventObserver(BundleContext bundleContext,
