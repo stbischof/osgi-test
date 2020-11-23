@@ -36,8 +36,8 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.test.common.annotation.InjectBundleContext;
+import org.osgi.test.common.listener.Events;
 import org.osgi.test.junit5.context.BundleContextExtension;
-import org.osgi.test.junit5.event.store.EventStore;
 import org.osgi.test.junit5.event.store.EventStoreImpl;
 import org.osgi.test.junit5.event.store.Observer;
 import org.osgi.test.junit5.event.store.Observer.Result;
@@ -73,7 +73,7 @@ public class EventStoreImplTest {
 
 		// Create Observer that catches Events
 		Observer<List<FrameworkEvent>> observator = store
-			.newFrameworkEventObervator(EventStore.isFrameworkEventType(FrameworkEvent.ERROR), 1, true);
+			.newFrameworkEventObervator(Events.isFrameworkEventType(FrameworkEvent.ERROR), 1, true);
 
 		// Create and fire event
 		FrameworkEvent event = new FrameworkEvent(FrameworkEvent.ERROR, bundle, null);
@@ -116,7 +116,7 @@ public class EventStoreImplTest {
 
 		// Create Observer that catches Events
 		Observer<List<BundleEvent>> observator = store
-			.newBundleEventObervator(EventStore.isBundleEventType(BundleEvent.INSTALLED), 1, true);
+			.newBundleEventObervator(Events.isBundleEventType(BundleEvent.INSTALLED), 1, true);
 
 		// Create and fire event
 		BundleEvent event = new BundleEvent(BundleEvent.INSTALLED, bundle, bundle);
@@ -163,7 +163,7 @@ public class EventStoreImplTest {
 
 		// Create Observer that catches Events
 		Observer<List<ServiceEvent>> observator = store
-			.newServiceEventObervator(EventStore.serviceEventType(ServiceEvent.REGISTERED), 1, true);
+			.newServiceEventObervator(Events.serviceEventType(ServiceEvent.REGISTERED), 1, true);
 
 		// Create and fire event
 		ServiceEvent event = new ServiceEvent(ServiceEvent.REGISTERED, sr);

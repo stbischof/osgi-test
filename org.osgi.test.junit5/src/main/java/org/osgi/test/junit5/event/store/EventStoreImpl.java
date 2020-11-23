@@ -16,6 +16,7 @@ import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.test.common.listener.Events;
 
 public class EventStoreImpl implements FrameworkListener, BundleListener, ServiceListener, EventStore {
 
@@ -73,7 +74,7 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 
 	@Override
 	public Stream<BundleEvent> getEventsBundle(final int eventTypeMask) {
-		return getEventsBundle().filter(EventStore.isBundleEventType(eventTypeMask));
+		return getEventsBundle().filter(Events.isBundleEventType(eventTypeMask));
 	}
 
 	@Override
@@ -83,7 +84,7 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 
 	@Override
 	public Stream<FrameworkEvent> getEventsFramework(final int eventTypeMask) {
-		return getEventsFramework().filter(EventStore.isFrameworkEventType(eventTypeMask));
+		return getEventsFramework().filter(Events.isFrameworkEventType(eventTypeMask));
 	}
 
 	@Override
@@ -93,7 +94,7 @@ public class EventStoreImpl implements FrameworkListener, BundleListener, Servic
 
 	@Override
 	public Stream<ServiceEvent> getEventsService(final int eventTypeMask) {
-		return getEventsService().filter(EventStore.serviceEventType(eventTypeMask));
+		return getEventsService().filter(Events.serviceEventType(eventTypeMask));
 	}
 
 	@Override
