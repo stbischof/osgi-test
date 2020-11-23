@@ -1,29 +1,37 @@
-package org.osgi.test.junit5.event.store;
+package org.osgi.test.common.listener.observer;
 
 import java.util.concurrent.TimeUnit;
 
 public interface Observer<T> {
 
 	/**
-	 * Waits for the expected Result or the timeout. Must call start if not
+	 * Waits for the expected Event or the timeout. Must call start if not
 	 * started;
 	 *
-	 * @return result - the expected Result the Observer is waiting for.
+	 * @return true if the the expected Result the Observer is waiting for
+	 *         matched.
 	 */
-	Result<T> waitFor(long timeout, TimeUnit timeUnit);
+	boolean waitFor(long timeout, TimeUnit timeUnit);
 
 	/**
-	 * Waits for the expected Result or the default timeout. Must call start if
+	 * Waits for the expected Event or the default timeout. Must call start if
 	 * not started;
 	 *
-	 * @return result - the expected Result the Observer is waiting for.
+	 * @return true if the the expected Result the Observer is waiting for
+	 *         matched.
 	 */
-	Result<T> waitFor();
+	boolean waitFor();
 
 	/**
 	 * starts to observe
 	 */
 	void start();
+	/*
+	 * Result of an Observer. Ihe Data will be the incomplete Object found until
+	 * timeout.
+	 */
+
+	Result<T> getResult();
 
 	/**
 	 * Result of an Observer.

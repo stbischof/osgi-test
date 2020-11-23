@@ -9,12 +9,20 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.test.common.dictionary.Dictionaries;
+import org.osgi.test.common.listener.observer.BundleEventObserverMulti;
+import org.osgi.test.common.listener.observer.BundleEventObserverSingle;
+import org.osgi.test.common.listener.observer.FrameworkEventObserverMulti;
+import org.osgi.test.common.listener.observer.FrameworkEventObserverSingle;
+import org.osgi.test.common.listener.observer.Observer;
+import org.osgi.test.common.listener.observer.ServiceEventObserverMulti;
+import org.osgi.test.common.listener.observer.ServiceEventObserverSingle;
 
 public class Events {
 
@@ -28,7 +36,6 @@ public class Events {
 		return e -> (e.getType() & eventTypeMask) != 0;
 	}
 
-	// TODO: more strucure and Tests
 	public static Predicate<ServiceEvent> serviceEventType(final int eventTypeMask) {
 		return e -> (e.getType() & eventTypeMask) != 0;
 	}
@@ -93,6 +100,36 @@ public class Events {
 
 	public static Predicate<ServiceEvent> serviceModifiedEndmatch(final Class<?> clazz) {
 		return serviceEventWith(ServiceEvent.MODIFIED_ENDMATCH, clazz);
+	}
+
+	public static Observer<BundleEvent> newBundleEventObserver(BundleContext bundleContext,
+		Predicate<BundleEvent> matches, boolean immidiate) {
+		return new BundleEventObserverSingle(bundleContext, matches, immidiate);
+	}
+
+	public static Observer<List<BundleEvent>> newBundleEventObserver(BundleContext bundleContext,
+		Predicate<BundleEvent> matches, int count, boolean immidiate) {
+		return new BundleEventObserverMulti(bundleContext, matches, count, immidiate);
+	}
+
+	public static Observer<FrameworkEvent> newFrameworkEventObserver(BundleContext bundleContext,
+		Predicate<FrameworkEvent> matches, boolean immidiate) {
+		return new FrameworkEventObserverSingle(bundleContext, matches, immidiate);
+	}
+
+	public static Observer<List<FrameworkEvent>> newFrameworkEventObserver(BundleContext bundleContext,
+		Predicate<FrameworkEvent> matches, int count, boolean immidiate) {
+		return new FrameworkEventObserverMulti(bundleContext, matches, count, immidiate);
+	}
+
+	public static Observer<ServiceEvent> newServiceEventObserver(BundleContext bundleContext,
+		Predicate<ServiceEvent> matches, boolean immidiate) {
+		return new ServiceEventObserverSingle(bundleContext, matches, immidiate);
+	}
+
+	public static Observer<List<ServiceEvent>> newServiceEventObserver(BundleContext bundleContext,
+		Predicate<ServiceEvent> matches, int count, boolean immidiate) {
+		return new ServiceEventObserverMulti(bundleContext, matches, count, immidiate);
 	}
 
 }

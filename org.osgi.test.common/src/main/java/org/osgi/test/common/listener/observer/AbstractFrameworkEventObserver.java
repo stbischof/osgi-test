@@ -1,26 +1,28 @@
-package org.osgi.test.junit5.event.store;
+package org.osgi.test.common.listener.observer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 
-public class FrameworkEventObserver extends AbstractObserver<List<FrameworkEvent>> {
+public abstract class AbstractFrameworkEventObserver<E> extends AbstracEventObserver<E> {
 	private FrameworkListener		listener;
-	private EventStore				store;
+
 	private List<FrameworkEvent>	objects	= new ArrayList<>();
 
-	public FrameworkEventObserver(EventStore store, Predicate<FrameworkEvent> matches, int count, boolean immidiate) {
-		super(count, immidiate);
-		this.store = store;
+	public AbstractFrameworkEventObserver(BundleContext bundleContext, Predicate<FrameworkEvent> matches, int count,
+		boolean immidiate) {
+		super(count, immidiate, bundleContext);
+
 		listener = new FrameworkListener() {
 
 			@Override
 			public void frameworkEvent(FrameworkEvent event) {
 				if (matches.test(event)) {
-					objects.add(event);
+					objects().add(event);
 					countDownLatch().countDown();
 				}
 			}
@@ -32,17 +34,18 @@ public class FrameworkEventObserver extends AbstractObserver<List<FrameworkEvent
 
 	@Override
 	protected void unregister() {
-		store.removeFrameworkListenerDelegate(listener);
+		bundleContext().removeFrameworkListener(listener);
 	}
 
 	@Override
 	protected void register() {
-		store.addFrameworkListenerDelegate(listener);
+		bundleContext().addFrameworkListener(listener);
 	}
 
-	@Override
-	protected List<FrameworkEvent> getResultObject() {
+	protected List<FrameworkEvent> objects() {
 		return objects;
 	}
+
+
 
 }

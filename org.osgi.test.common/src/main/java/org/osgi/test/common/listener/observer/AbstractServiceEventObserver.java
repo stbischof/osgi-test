@@ -1,26 +1,28 @@
-package org.osgi.test.junit5.event.store;
+package org.osgi.test.common.listener.observer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 
-public class ServiceEventObserver extends AbstractObserver<List<ServiceEvent>> {
+public abstract class AbstractServiceEventObserver<E> extends AbstracEventObserver<E> {
 	private ServiceListener		listener;
-	private EventStore			store;
+
 	private List<ServiceEvent>	objects	= new ArrayList<>();
 
-	public ServiceEventObserver(EventStore store, Predicate<ServiceEvent> matches, int count, boolean immidiate) {
-		super(count, immidiate);
-		this.store = store;
+	public AbstractServiceEventObserver(BundleContext bundleContext, Predicate<ServiceEvent> matches, int count,
+		boolean immidiate) {
+		super(count, immidiate, bundleContext);
+
 		listener = new ServiceListener() {
 
 			@Override
 			public void serviceChanged(ServiceEvent event) {
 				if (matches.test(event)) {
-					objects.add(event);
+					objects().add(event);
 					countDownLatch().countDown();
 				}
 			}
@@ -32,16 +34,15 @@ public class ServiceEventObserver extends AbstractObserver<List<ServiceEvent>> {
 
 	@Override
 	protected void unregister() {
-		store.removeServiceListenerDelegate(listener);
+		bundleContext().removeServiceListener(listener);
 	}
 
 	@Override
 	protected void register() {
-		store.addServiceListenerDelegate(listener);
+		bundleContext().addServiceListener(listener);
 	}
 
-	@Override
-	protected List<ServiceEvent> getResultObject() {
+	public List<ServiceEvent> objects() {
 		return objects;
 	}
 

@@ -27,22 +27,15 @@ import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.test.common.annotation.InjectEventListener;
 import org.osgi.test.junit5.context.BundleContextExtension;
-import org.osgi.test.junit5.event.store.EventStore;
 
 @ExtendWith(BundleContextExtension.class)
 @ExtendWith(EventListenerExtension.class)
-public class EventListenerTest {
+public class EventListenerExtensionTest {
 
 	@InjectEventListener
 	static CustomListener	staticListener;
 	@InjectEventListener
 	CustomListener			listener;
-
-	@InjectEventListener
-	static EventStore		staticEventStore;
-
-	@InjectEventListener
-	EventStore				eventStore;
 
 	@BeforeAll
 	public static void beforeAll() throws Exception {
@@ -59,13 +52,7 @@ public class EventListenerTest {
 	public void testWithField() throws Exception {
 		assertThat(staticListener).isNotNull();
 		assertThat(listener).isNotNull();
-		assertThat(staticEventStore).isNotNull();
-		assertThat(eventStore).isNotNull();
-	}
 
-	@Test
-	public void testWithEventStoreParameter(@InjectEventListener EventStore eventStore) throws Exception {
-		assertThat(eventStore).isNotNull();
 	}
 
 	@Test

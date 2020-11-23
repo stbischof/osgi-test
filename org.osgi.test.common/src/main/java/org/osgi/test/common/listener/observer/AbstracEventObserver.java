@@ -1,4 +1,4 @@
-package org.osgi.test.junit5.event.store;
+package org.osgi.test.common.listener.observer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,18 +6,22 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.test.common.exceptions.Exceptions;
 
-public abstract class AbstractObserver<T> implements Observer<T> {
+public abstract class AbstracEventObserver<T> implements Observer<T> {
 
 	private CountDownLatch	countDownLatch;
 	private boolean			started;
+	private BundleContext	bundleContext;
+	private AbstracEventObserver<T>.DefaultResult<T>	waitResult;
 
-	public AbstractObserver(int count, boolean immidiate) {
+	public AbstracEventObserver(int count, boolean immidiate, BundleContext bundleContext) {
 
 		countDownLatch = new CountDownLatch(count);
 		List<ServiceEvent> events = Collections.synchronizedList(new ArrayList<>());
+		this.bundleContext = bundleContext;
 
 	}
 
@@ -26,22 +30,33 @@ public abstract class AbstractObserver<T> implements Observer<T> {
 	}
 
 	@Override
-	public Result<T> waitFor() {
+	public boolean waitFor() {
 		return waitFor(200, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
-	public Result<T> waitFor(long timeout, TimeUnit timeUnit) {
+	public boolean waitFor(long timeout, TimeUnit timeUnit) {
 		start();
 		try {
 			boolean ok = countDownLatch.await(timeout, timeUnit);
-			return new DefaultResult<T>(!ok, getResultObject());
+			waitResult = new DefaultResult<T>(!ok, getResultObject());
+			return ok;
 		} catch (InterruptedException e) {
 			Exceptions.unchecked(() -> e);
 		} finally {
 			unregister();
 		}
 		throw new AssertionError("unreachable");
+	}
+
+
+	@Override
+	public Result<T> getResult() {
+
+		if (waitResult == null) {
+			throw new RuntimeException("waitFor has to be executed before");
+		}
+		return waitResult;
 	}
 
 	@Override
@@ -57,6 +72,10 @@ public abstract class AbstractObserver<T> implements Observer<T> {
 	protected abstract T getResultObject();
 
 	protected abstract void unregister();
+
+	protected BundleContext bundleContext() {
+		return bundleContext;
+	}
 
 	class DefaultResult<E> implements Result<E> {
 		private boolean	timedOut;

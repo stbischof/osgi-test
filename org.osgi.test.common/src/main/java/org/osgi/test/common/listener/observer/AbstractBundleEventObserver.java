@@ -1,26 +1,27 @@
-package org.osgi.test.junit5.event.store;
+package org.osgi.test.common.listener.observer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 
-public class BundleEventObserver extends AbstractObserver<List<BundleEvent>> {
+public abstract class AbstractBundleEventObserver<E> extends AbstracEventObserver<E> {
 	private BundleListener		listener;
-	private EventStore			store;
 	private List<BundleEvent>	objects	= new ArrayList<>();
 
-	public BundleEventObserver(EventStore store, Predicate<BundleEvent> matches, int count, boolean immidiate) {
-		super(count, immidiate);
-		this.store = store;
+	public AbstractBundleEventObserver(BundleContext bundleContext, Predicate<BundleEvent> matches, int count,
+		boolean immidiate) {
+		super(count, immidiate, bundleContext);
+
 		listener = new BundleListener() {
 
 			@Override
 			public void bundleChanged(BundleEvent event) {
 				if (matches.test(event)) {
-					objects.add(event);
+					objects().add(event);
 					countDownLatch().countDown();
 				}
 			}
@@ -32,16 +33,15 @@ public class BundleEventObserver extends AbstractObserver<List<BundleEvent>> {
 
 	@Override
 	protected void unregister() {
-		store.removeBundleListenerDelegate(listener);
+		bundleContext().removeBundleListener(listener);
 	}
 
 	@Override
 	protected void register() {
-		store.addBundleListenerDelegate(listener);
+		bundleContext().addBundleListener(listener);
 	}
 
-	@Override
-	protected List<BundleEvent> getResultObject() {
+	protected List<BundleEvent> objects() {
 		return objects;
 	}
 

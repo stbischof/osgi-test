@@ -51,8 +51,6 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.test.common.annotation.InjectEventListener;
 import org.osgi.test.common.inject.TargetType;
 import org.osgi.test.junit5.context.BundleContextExtension;
-import org.osgi.test.junit5.event.store.EventStore;
-import org.osgi.test.junit5.event.store.EventStoreImpl;
 
 public class EventListenerExtension implements BeforeAllCallback, BeforeEachCallback, ParameterResolver {
 	@Override
@@ -193,10 +191,7 @@ public class EventListenerExtension implements BeforeAllCallback, BeforeEachCall
 	private Object serviceListenerFromTargetClass(TargetType targetType, InjectEventListener injectListener,
 		ExtensionContext extensionContext) {
 		try {
-			if (targetType.getType()
-				.equals(EventStore.class)) {
-				return new EventStoreImpl();
-			}
+
 			Optional<Constructor<?>> oConstructor = parameterlessPublicConstructor(targetType.getType());
 			if (oConstructor.isPresent()) {
 				Object listener = oConstructor.get()
@@ -220,11 +215,8 @@ public class EventListenerExtension implements BeforeAllCallback, BeforeEachCall
 		if (oAnn.isPresent()) {
 			InjectEventListener injectListener = oAnn.get();
 			TargetType targetType = TargetType.of(parameterContext.getParameter());
-			if (targetType.getType()
-				.equals(EventStore.class)
-				|| !injectListener.providerMethod()
-					.isEmpty()
-				|| parameterlessPublicConstructor(targetType.getType()).isPresent()) {
+			if (!injectListener.providerMethod()
+				.isEmpty() || parameterlessPublicConstructor(targetType.getType()).isPresent()) {
 				return true;
 			}
 		}
