@@ -1,4 +1,4 @@
-package org.osgi.test.common.listener.observer;
+package org.osgi.test.common.listener;
 
 import java.util.concurrent.TimeUnit;
 

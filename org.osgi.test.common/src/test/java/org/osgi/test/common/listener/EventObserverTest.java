@@ -38,8 +38,7 @@ import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-import org.osgi.test.common.listener.observer.Observer;
-import org.osgi.test.common.listener.observer.Observer.Result;
+import org.osgi.test.common.listener.Observer.Result;
 
 public class EventObserverTest {
 

@@ -16,13 +16,6 @@ import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceReference;
 import org.osgi.test.common.dictionary.Dictionaries;
-import org.osgi.test.common.listener.observer.BundleEventObserverMulti;
-import org.osgi.test.common.listener.observer.BundleEventObserverSingle;
-import org.osgi.test.common.listener.observer.FrameworkEventObserverMulti;
-import org.osgi.test.common.listener.observer.FrameworkEventObserverSingle;
-import org.osgi.test.common.listener.observer.Observer;
-import org.osgi.test.common.listener.observer.ServiceEventObserverMulti;
-import org.osgi.test.common.listener.observer.ServiceEventObserverSingle;
 
 public class Events {
 
@@ -111,7 +104,7 @@ public class Events {
 	 */
 	public static Observer<BundleEvent> newBundleEventObserver(BundleContext bundleContext,
 		Predicate<BundleEvent> matches, boolean immidiate) {
-		return new BundleEventObserverSingle(bundleContext, matches, immidiate);
+		return new BundleEventObserver.Single(bundleContext, matches, immidiate);
 	}
 
 	/**
@@ -126,7 +119,7 @@ public class Events {
 	 */
 	public static Observer<List<BundleEvent>> newBundleEventObserver(BundleContext bundleContext,
 		Predicate<BundleEvent> matches, int count, boolean immidiate) {
-		return new BundleEventObserverMulti(bundleContext, matches, count, immidiate);
+		return new BundleEventObserver.Multiple(bundleContext, matches, count, immidiate);
 	}
 
 	/**
@@ -141,7 +134,7 @@ public class Events {
 
 	public static Observer<FrameworkEvent> newFrameworkEventObserver(BundleContext bundleContext,
 		Predicate<FrameworkEvent> matches, boolean immidiate) {
-		return new FrameworkEventObserverSingle(bundleContext, matches, immidiate);
+		return new FrameworkEventObserver.Single(bundleContext, matches, immidiate);
 	}
 
 	/**
@@ -156,7 +149,7 @@ public class Events {
 	 */
 	public static Observer<List<FrameworkEvent>> newFrameworkEventObserver(BundleContext bundleContext,
 		Predicate<FrameworkEvent> matches, int count, boolean immidiate) {
-		return new FrameworkEventObserverMulti(bundleContext, matches, count, immidiate);
+		return new FrameworkEventObserver.Multiple(bundleContext, matches, count, immidiate);
 	}
 
 	/**
@@ -171,7 +164,7 @@ public class Events {
 
 	public static Observer<ServiceEvent> newServiceEventObserver(BundleContext bundleContext,
 		Predicate<ServiceEvent> matches, boolean immidiate) {
-		return new ServiceEventObserverSingle(bundleContext, matches, immidiate);
+		return new ServiceEventObserver.Single(bundleContext, matches, immidiate);
 	}
 
 	/**
@@ -186,7 +179,7 @@ public class Events {
 	 */
 	public static Observer<List<ServiceEvent>> newServiceEventObserver(BundleContext bundleContext,
 		Predicate<ServiceEvent> matches, int count, boolean immidiate) {
-		return new ServiceEventObserverMulti(bundleContext, matches, count, immidiate);
+		return new ServiceEventObserver.Multiple(bundleContext, matches, count, immidiate);
 	}
 
 }

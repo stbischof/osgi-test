@@ -1,4 +1,4 @@
-package org.osgi.test.common.listener.observer;
+package org.osgi.test.common.listener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,11 +10,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.test.common.exceptions.Exceptions;
 
-public abstract class AbstracEventObserver<T> implements Observer<T> {
+abstract class AbstracEventObserver<T> implements Observer<T> {
 
-	private CountDownLatch	countDownLatch;
-	private boolean			started;
-	private BundleContext	bundleContext;
+	private CountDownLatch								countDownLatch;
+	private boolean										started;
+	private BundleContext								bundleContext;
 	private AbstracEventObserver<T>.DefaultResult<T>	waitResult;
 
 	public AbstracEventObserver(int count, boolean immidiate, BundleContext bundleContext) {
@@ -48,7 +48,6 @@ public abstract class AbstracEventObserver<T> implements Observer<T> {
 		}
 		throw new AssertionError("unreachable");
 	}
-
 
 	@Override
 	public Result<T> getResult() {
