@@ -81,6 +81,15 @@ public class Events {
 		return isServiceEventWith(ServiceEvent.REGISTERED, objectClass);
 	}
 
+	public static Predicate<ServiceEvent> isServiceRegisteredWith(final Class<?> objectClass, Map<String, Object> map) {
+		return isServiceEventWith(ServiceEvent.REGISTERED, objectClass, map);
+	}
+
+	public static Predicate<ServiceEvent> isServiceRegisteredWith(final Class<?> objectClass,
+		Dictionary<String, Object> dictionary) {
+		return isServiceEventWith(ServiceEvent.REGISTERED, objectClass, dictionary);
+	}
+
 	public static Predicate<ServiceEvent> isServiceUnregistering(final Class<?> objectClass) {
 		return isServiceEventWith(ServiceEvent.UNREGISTERING, objectClass);
 	}

@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.osgi.test.common.listener.Events.isServiceRegistered;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
+import org.osgi.test.common.listener.EventsTest.A;
 import org.osgi.test.common.listener.Observer.Result;
 
 public class EventObserverTest {
@@ -212,6 +214,59 @@ public class EventObserverTest {
 		assertThat(bundleListeners).isEmpty();
 		assertThat(frameworkListeners).isEmpty();
 		assertThat(serviceListeners).isEmpty();
+
+	}
+
+	@Test
+	public void exampleSingle() throws Exception {
+
+		// Create an Observer with the given count (here one) and
+		// Predicate-Matches
+		Observer<ServiceEvent> observerSingle = Events.newServiceEventObserver(bundleContext,
+			isServiceRegistered(A.class), false);
+
+		// starts observing
+		observerSingle.start();
+
+		if (observerSingle.waitFor(200, TimeUnit.MILLISECONDS)) {
+			// return true when waitFor catches event before timeOut
+		} else {
+			// return false when waitFor times out
+		}
+
+		// Check that the event happened
+		Result<ServiceEvent> resultSingle = observerSingle.getResult();
+
+		resultSingle.isTimedOut();
+
+		// use the event
+		ServiceEvent event = resultSingle.get();
+		event.getServiceReference();
+	}
+
+	@Test
+	public void exampleMultiple() throws Exception {
+
+		// Create an Observer with the given count and Predicate-Matches
+		Observer<List<ServiceEvent>> observerSingle = Events.newServiceEventObserver(bundleContext,
+			isServiceRegistered(A.class), 5, false);
+
+		// starts observing
+		observerSingle.start();
+
+		if (observerSingle.waitFor(200, TimeUnit.MILLISECONDS)) {
+			// return true when waitFor catches 5 events before timeOut
+		} else {
+			// return false when waitFor times out
+		}
+
+		// Check that the event happened
+		Result<List<ServiceEvent>> resultSingle = observerSingle.getResult();
+
+		if (resultSingle.isTimedOut()) {
+			// events catched until Timeout
+			List<ServiceEvent> event = resultSingle.get();
+		}
 
 	}
 
