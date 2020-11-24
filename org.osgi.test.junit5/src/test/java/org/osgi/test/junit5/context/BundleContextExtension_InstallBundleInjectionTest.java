@@ -157,7 +157,7 @@ public class BundleContextExtension_InstallBundleInjectionTest {
 	static void afterAll(@InjectInstallBundle InstallBundle ib) {
 		staticSoftly = new OSGiSoftAssertions();
 		staticSoftly.assertThat(staticIB)
-			.as("staticIB:beforeAll")
+			.as("staticIB:AfterAll")
 			.isNotNull()
 			.isSameAs(ib)
 			.extracting(InstallBundle::getBundleContext)

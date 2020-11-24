@@ -18,19 +18,292 @@ package org.osgi.test.common.install;
 
 import static org.osgi.test.common.exceptions.Exceptions.duck;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
 
 public class InstallBundle {
+
+	/**
+	 * EmbeddedLocation describes a Location of a File inside a Bundle.
+	 */
+	public static class EmbeddedLocation {
+
+		private static Optional<Bundle> findBundle(BundleContext bc, String bundleSymbolicName, Version bundleVersion) {
+
+			return Stream.of(bc.getBundles())
+				.filter(b -> b.getSymbolicName()
+					.equals(bundleSymbolicName))
+				.filter(b -> b.getVersion()
+					.equals(bundleVersion))
+				.findAny();
+		}
+
+		/**
+		 * Creates an EmbeddedLocation by the given parameters. Existence of
+		 * File is tested at creation time.
+		 *
+		 * @param bundleContext - if null it searches the file in the root of
+		 *            the BundelContexts bundle.
+		 * @param oBundleSymbolicName s- ymbolicName of the bundle that embedded
+		 *            the file must not be null
+		 * @param oBundleVersion - version of the bundle that embedded the file
+		 *            -
+		 * @param oPath - the optional path in the jar
+		 * @param file - the filename must not be null
+		 * @return EmbeddedLocation
+		 */
+		public static EmbeddedLocation of(BundleContext bundleContext, Optional<String> oBundleSymbolicName,
+			Optional<String> oBundleVersion, Optional<String> oPath, String file) {
+
+			String bundleSymbolicName;
+			Version bundleVersion;
+
+			if (oBundleSymbolicName.isPresent()) {
+				bundleSymbolicName = oBundleSymbolicName.get();
+				bundleVersion = oBundleVersion.map(v -> Version.parseVersion(v))
+					.orElseGet(() -> {
+						return Stream.of(bundleContext.getBundles())
+							.filter(b -> b.getSymbolicName()
+								.equals(bundleSymbolicName))
+							.findFirst()
+							.orElseThrow(() -> {
+								return new IllegalArgumentException(
+									String.format("Unknown Bundle with SymbolicName: %s", bundleSymbolicName));
+							})
+							.getVersion();
+					});
+
+			} else {
+				Bundle bundle = bundleContext.getBundle();
+				bundleSymbolicName = bundle.getSymbolicName();
+				bundleVersion = oBundleVersion.map(v -> Version.parseVersion(v))
+					.orElse(bundle.getVersion());
+			}
+
+			findBundle(bundleContext, bundleSymbolicName, bundleVersion).orElseThrow(() -> {
+				return new IllegalArgumentException(String.format(
+					"Unknown Bundle with SymbolicName '%s' and Version: '%s'", bundleSymbolicName, bundleVersion));
+			});
+			return new EmbeddedLocation(bundleSymbolicName, bundleVersion, oPath.orElse("/"), file);
+		}
+
+		/**
+		 * Creates an EmbeddedLocation by the spec. Existence of File is tested
+		 * at creation time.
+		 *
+		 * @param bundleContext
+		 * @param spec 'bundle.symbilic.name:1.2.3:/path/file.jar'
+		 *            <p>
+		 *            In minimum 'file.jar' must be used. Then it searches the
+		 *            file in the root of the BundelContexts bundle.
+		 * @return EmbeddedLocation
+		 */
+		public static EmbeddedLocation of(BundleContext bundleContext, String spec) {
+
+			Optional<String> oBundleSymbolicName;
+			Optional<String> oBundleVersion;
+			String[] parts = spec.split(":");
+			String fullPath;
+			if (parts.length == 1) {
+
+				oBundleSymbolicName = Optional.empty();
+				oBundleVersion = Optional.empty();
+				fullPath = parts[0];
+			} else if (parts.length == 2) {
+				oBundleSymbolicName = Optional.of(parts[0]);
+				oBundleVersion = Optional.empty();
+				fullPath = parts[1];
+			} else if (parts.length == 3) {
+				oBundleSymbolicName = Optional.of(parts[0]);
+				oBundleVersion = Optional.of(parts[1]);
+				fullPath = parts[2];
+			} else {
+				throw new IllegalArgumentException("Wrong pattern :" + spec);
+			}
+
+			int indexOfFileBegin = fullPath.lastIndexOf('/') + 1;
+
+			String file = fullPath.substring(indexOfFileBegin);
+
+			if (file.isEmpty()) {
+				throw new IllegalArgumentException(String.format("could not find a filename : ", spec));
+
+			}
+			Optional<String> oPath = Optional.of(fullPath.substring(0, indexOfFileBegin));
+
+			return EmbeddedLocation.of(bundleContext, oBundleSymbolicName, oBundleVersion, oPath, file);
+
+		}
+
+		/**
+		 * Creates an EmbeddedLocation by the pure parameters. existence of File
+		 * not tested at creation time.
+		 *
+		 * @param bundleSymbolicName - symbolicName of the bundle that embedded
+		 *            the file must not be null
+		 * @param bundleVersion - version of the bundle that embedded the file -
+		 *            must not be null
+		 * @param path - the path in the jar - must not be null
+		 * @param file - the filename must not be null
+		 * @return EmbeddedLocation
+		 */
+		public static EmbeddedLocation of(String bundleSymbolicName, Version bundleVersion, String path, String file) {
+			return new EmbeddedLocation(bundleSymbolicName, bundleVersion, path, file);
+		}
+
+		private String	bundleSymbolicName;
+
+		private Version	bundleVersion;
+
+		private String	file;
+		private String	path;
+
+		private EmbeddedLocation() {
+			// no access here.
+		}
+
+		private EmbeddedLocation(String bundleSymbolicName, Version bundleVersion, String path, String file) {
+			if (bundleSymbolicName == null) {
+				throw new IllegalArgumentException("bundleSymbolicName must not be null");
+			}
+			if (bundleVersion == null) {
+				throw new IllegalArgumentException("bundleVersion must not be null");
+			}
+			if (path == null) {
+				throw new IllegalArgumentException("path must not be null");
+			}
+			if (file == null) {
+				throw new IllegalArgumentException("file must not be null");
+			}
+			this.bundleSymbolicName = bundleSymbolicName;
+			this.bundleVersion = bundleVersion;
+
+			path = path.startsWith("/") ? path.substring(1) : path;
+			path = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+			this.path = path;
+
+			if (file.startsWith("/")) {
+				file = file.substring(1);
+			}
+			this.file = file;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			EmbeddedLocation other = (EmbeddedLocation) obj;
+			if (bundleSymbolicName == null) {
+				if (other.bundleSymbolicName != null)
+					return false;
+			} else if (!bundleSymbolicName.equals(other.bundleSymbolicName))
+				return false;
+			if (bundleVersion == null) {
+				if (other.bundleVersion != null)
+					return false;
+			} else if (!bundleVersion.equals(other.bundleVersion))
+				return false;
+			if (file == null) {
+				if (other.file != null)
+					return false;
+			} else if (!file.equals(other.file))
+				return false;
+			if (path == null) {
+				if (other.path != null)
+					return false;
+			} else if (!path.equals(other.path))
+				return false;
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((bundleSymbolicName == null) ? 0 : bundleSymbolicName.hashCode());
+			result = prime * result + ((bundleVersion == null) ? 0 : bundleVersion.hashCode());
+			result = prime * result + ((file == null) ? 0 : file.hashCode());
+			result = prime * result + ((path == null) ? 0 : path.hashCode());
+			return result;
+		}
+
+		public InputStream openStream(BundleContext bc) throws IOException, IllegalArgumentException {
+
+			Bundle bundle = Stream.of(bc.getBundles())
+				.filter(b -> b.getSymbolicName()
+					.equals(bundleSymbolicName))
+				.filter(b -> b.getVersion()
+					.equals(bundleVersion))
+				.findFirst()
+				.orElseThrow(() -> new IllegalArgumentException(
+					String.format("Bundle %s:%s does not exist in framework", bundleSymbolicName, bundleVersion)));
+
+			Enumeration<URL> entries = bundle.findEntries(path, file, false);
+			URL jarEmbeddedFileUrl = Collections.list(entries)
+				.stream()
+				.findFirst()
+				.orElseThrow(() -> new IllegalArgumentException(String.format("File %s in Path %s not in Bundle %s:%s ",
+					file, path, bundle.getSymbolicName(), bundle.getVersion())));
+
+			return jarEmbeddedFileUrl.openStream();
+		}
+
+		@Override
+		public String toString() {
+
+			return String.format("bundle:" + bundleSymbolicName + ":" + bundleVersion + ":" + path + "/" + file);
+		}
+	}
 
 	private final BundleContext bundleContext;
 
 	public InstallBundle(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
+	}
+
+	/**
+	 * @return The bundle context that this instance is attached to.
+	 */
+	public BundleContext getBundleContext() {
+		return bundleContext;
+	}
+
+	/**
+	 * Install a bundle from a given EmbeddedLocation.
+	 * <p>
+	 * When implemented against {@code CloseableBundleContext} bundles installed
+	 * in this fashion are uninstalled automatically at the end of the test
+	 * method.
+	 *
+	 * @param location of the jar resource.
+	 * @param startBundle if true, start the bundle
+	 * @return installed bundle
+	 * @throws AssertionError if no bundle is found
+	 */
+	public Bundle installBundle(EmbeddedLocation location, boolean startBundle) {
+
+		try (InputStream is = location.openStream(bundleContext)) {
+			Bundle bundle = bundleContext.installBundle(location.toString(), is);
+			if (startBundle) {
+				bundle.start();
+			}
+			return bundle;
+		} catch (Exception e) {
+			throw duck(e);
+		}
 	}
 
 	/**
@@ -75,13 +348,26 @@ public class InstallBundle {
 		} : new String[] {
 			pathToEmbeddedJar.substring(0, lastIndexOf), pathToEmbeddedJar.substring(lastIndexOf + 1)
 		};
-		Enumeration<URL> entries = bundleContext.getBundle()
-			.findEntries(parts[0], parts[1], false);
-		if (entries == null || !entries.hasMoreElements())
-			throw new AssertionError("No bundle entry " + pathToEmbeddedJar + " found in " + bundleContext.getBundle());
-		try (InputStream is = entries.nextElement()
-			.openStream()) {
-			Bundle bundle = bundleContext.installBundle(pathToEmbeddedJar, is);
+
+		return installBundle(EmbeddedLocation.of(bundleContext, pathToEmbeddedJar), startBundle);
+	}
+
+	/**
+	 * Install a bundle from a given URL.
+	 * <p>
+	 * When implemented against {@code CloseableBundleContext} bundles installed
+	 * in this fashion are uninstalled automatically at the end of the test
+	 * method.
+	 *
+	 * @param url to the jar resource.
+	 * @param startBundle if true, start the bundle
+	 * @return installed bundle
+	 * @throws AssertionError if no bundle is found
+	 */
+	public Bundle installBundle(URL url, boolean startBundle) {
+
+		try (InputStream is = url.openStream()) {
+			Bundle bundle = bundleContext.installBundle(url.toString(), is);
 			if (startBundle) {
 				bundle.start();
 			}
@@ -89,12 +375,5 @@ public class InstallBundle {
 		} catch (Exception e) {
 			throw duck(e);
 		}
-	}
-
-	/**
-	 * @return The bundle context that this instance is attached to.
-	 */
-	public BundleContext getBundleContext() {
-		return bundleContext;
 	}
 }
