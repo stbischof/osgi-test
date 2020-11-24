@@ -2,6 +2,7 @@ package org.osgi.test.common.listener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.osgi.framework.BundleContext;
@@ -45,15 +46,15 @@ public abstract class BundleEventObserver<E> extends AbstracEventObserver<E> {
 		return objects;
 	}
 
-	public static class Single extends BundleEventObserver<BundleEvent> {
+	public static class Single extends BundleEventObserver<Optional<BundleEvent>> {
 
 		public Single(BundleContext bundleContext, Predicate<BundleEvent> matches, boolean immidiate) {
 			super(bundleContext, matches, 1, immidiate);
 		}
 
 		@Override
-		protected BundleEvent getResultObject() {
-			return objects().get(0);
+		protected Optional<BundleEvent> getResultObject() {
+			return objects().isEmpty() ? Optional.empty() : Optional.of(objects().get(0));
 		}
 	}
 

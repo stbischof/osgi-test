@@ -24,6 +24,7 @@ import static org.osgi.test.common.listener.Events.isServiceRegistered;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
@@ -111,7 +112,7 @@ public class EventObserverTest {
 			.matches("t.*") && (event.getType() & BundleEvent.INSTALLED) != 0);
 
 		// Create an Obervator with the given count and Predicate-Matcher
-		Observer<BundleEvent> observerSingle = Events.newBundleEventObserver(bundleContext, matches, true);
+		Observer<Optional<BundleEvent>> observerSingle = Events.newBundleEventObserver(bundleContext, matches, true);
 		Observer<List<BundleEvent>> observerMulti = Events.newBundleEventObserver(bundleContext, matches, 2, true);
 
 		assertThat(bundleListeners).hasSize(2);
@@ -123,13 +124,14 @@ public class EventObserverTest {
 		assertThat(observerMulti.waitFor(1, TimeUnit.MILLISECONDS)).isFalse();
 		assertThat(bundleListeners).hasSize(0);
 
-		Result<BundleEvent> resultSingle = observerSingle.getResult();
+		Result<Optional<BundleEvent>> resultSingle = observerSingle.getResult();
 		Result<List<BundleEvent>> resultMulti = observerMulti.getResult();
 
 		// Check that the event happened
 		assertThat(resultSingle).isNotNull();
 		assertThat(resultSingle.isTimedOut()).isFalse();
-		assertThat(resultSingle.get()).isNotNull();
+		assertThat(resultSingle.get()
+			.get()).isNotNull();
 		assertThat(resultMulti).isNotNull();
 		assertThat(resultMulti.isTimedOut()).isTrue();
 		assertThat(resultMulti.get()).isNotNull();
@@ -148,7 +150,8 @@ public class EventObserverTest {
 		Predicate<FrameworkEvent> matches = (event) -> event.getType() == FrameworkEvent.STOPPED;
 
 		// Create an Obervator with the given count and Predicate-Matcher
-		Observer<FrameworkEvent> observerSingle = Events.newFrameworkEventObserver(bundleContext, matches, true);
+		Observer<Optional<FrameworkEvent>> observerSingle = Events.newFrameworkEventObserver(bundleContext, matches,
+			true);
 		Observer<List<FrameworkEvent>> observerMulti = Events.newFrameworkEventObserver(bundleContext, matches, 2,
 			true);
 
@@ -161,13 +164,14 @@ public class EventObserverTest {
 		assertThat(observerMulti.waitFor(1, TimeUnit.MILLISECONDS)).isFalse();
 		assertThat(frameworkListeners).hasSize(0);
 
-		Result<FrameworkEvent> resultSingle = observerSingle.getResult();
+		Result<Optional<FrameworkEvent>> resultSingle = observerSingle.getResult();
 		Result<List<FrameworkEvent>> resultMulti = observerMulti.getResult();
 
 		// Check that the event happened
 		assertThat(resultSingle).isNotNull();
 		assertThat(resultSingle.isTimedOut()).isFalse();
-		assertThat(resultSingle.get()).isNotNull();
+		assertThat(resultSingle.get()
+			.get()).isNotNull();
 		assertThat(resultMulti).isNotNull();
 		assertThat(resultMulti.isTimedOut()).isTrue();
 		assertThat(resultMulti.get()).isNotNull();
@@ -186,7 +190,7 @@ public class EventObserverTest {
 		Predicate<ServiceEvent> matches = (event) -> event.getType() == ServiceEvent.REGISTERED;
 
 		// Create an Obervator with the given count and Predicate-Matcher
-		Observer<ServiceEvent> observerSingle = Events.newServiceEventObserver(bundleContext, matches, true);
+		Observer<Optional<ServiceEvent>> observerSingle = Events.newServiceEventObserver(bundleContext, matches, true);
 		Observer<List<ServiceEvent>> observerMulti = Events.newServiceEventObserver(bundleContext, matches, 2, true);
 
 		assertThat(serviceListeners).hasSize(2);
@@ -199,13 +203,14 @@ public class EventObserverTest {
 		assertThat(observerMulti.waitFor(1, TimeUnit.MILLISECONDS)).isFalse();
 		assertThat(serviceListeners).hasSize(0);
 
-		Result<ServiceEvent> resultSingle = observerSingle.getResult();
+		Result<Optional<ServiceEvent>> resultSingle = observerSingle.getResult();
 		Result<List<ServiceEvent>> resultMulti = observerMulti.getResult();
 
 		// Check that the event happened
 		assertThat(resultSingle).isNotNull();
 		assertThat(resultSingle.isTimedOut()).isFalse();
-		assertThat(resultSingle.get()).isNotNull();
+		assertThat(resultSingle.get()
+			.get()).isNotNull();
 		assertThat(resultMulti).isNotNull();
 		assertThat(resultMulti.isTimedOut()).isTrue();
 		assertThat(resultMulti.get()).isNotNull();
@@ -222,7 +227,7 @@ public class EventObserverTest {
 
 		// Create an Observer with the given count (here one) and
 		// Predicate-Matches
-		Observer<ServiceEvent> observerSingle = Events.newServiceEventObserver(bundleContext,
+		Observer<Optional<ServiceEvent>> observerSingle = Events.newServiceEventObserver(bundleContext,
 			isServiceRegistered(A.class), false);
 
 		// starts observing
@@ -235,13 +240,17 @@ public class EventObserverTest {
 		}
 
 		// Check that the event happened
-		Result<ServiceEvent> resultSingle = observerSingle.getResult();
+		Result<Optional<ServiceEvent>> resultSingle = observerSingle.getResult();
 
 		resultSingle.isTimedOut();
 
 		// use the event
-		ServiceEvent event = resultSingle.get();
-		event.getServiceReference();
+		Optional<ServiceEvent> oEvent = resultSingle.get();
+		if (oEvent.isPresent()) {
+			oEvent.get()
+				.getServiceReference();
+
+		}
 	}
 
 	@Test

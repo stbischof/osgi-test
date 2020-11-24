@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -109,9 +110,9 @@ public class Events {
 	 * @param matches - Predicate that would be tested against the Events
 	 * @param immidiate - true start the Observer immediately. Could also be
 	 *            started later using start or waitFor method.
-	 * @return Observer<BundleEvent>
+	 * @return Observer<Optional<BundleEvent>>
 	 */
-	public static Observer<BundleEvent> newBundleEventObserver(BundleContext bundleContext,
+	public static Observer<Optional<BundleEvent>> newBundleEventObserver(BundleContext bundleContext,
 		Predicate<BundleEvent> matches, boolean immidiate) {
 		return new BundleEventObserver.Single(bundleContext, matches, immidiate);
 	}
@@ -124,7 +125,7 @@ public class Events {
 	 * @param count - the among of matching events the Observer is waitFor
 	 * @param immidiate - true start the Observer immediately. Could also be
 	 *            started later using start or waitFor method.
-	 * @return Observer<BundleEvent>
+	 * @return Observer<List<BundleEvent>>
 	 */
 	public static Observer<List<BundleEvent>> newBundleEventObserver(BundleContext bundleContext,
 		Predicate<BundleEvent> matches, int count, boolean immidiate) {
@@ -138,11 +139,12 @@ public class Events {
 	 * @param matches - Predicate that would be tested against the Events
 	 * @param immidiate - true start the Observer immediately. Could also be
 	 *            started later using start or waitFor method.
-	 * @return Observer<BundleEvent>
+	 * @return Observer<Optional<FrameworkEvent>>
 	 */
 
-	public static Observer<FrameworkEvent> newFrameworkEventObserver(BundleContext bundleContext,
-		Predicate<FrameworkEvent> matches, boolean immidiate) {
+	public static Observer<Optional<FrameworkEvent>>
+
+		newFrameworkEventObserver(BundleContext bundleContext, Predicate<FrameworkEvent> matches, boolean immidiate) {
 		return new FrameworkEventObserver.Single(bundleContext, matches, immidiate);
 	}
 
@@ -154,7 +156,7 @@ public class Events {
 	 * @param count - the among of matching events the Observer is waitFor
 	 * @param immidiate - true start the Observer immediately. Could also be
 	 *            started later using start or waitFor method.
-	 * @return Observer<BundleEvent>
+	 * @return Observer<List<FrameworkEvent>>
 	 */
 	public static Observer<List<FrameworkEvent>> newFrameworkEventObserver(BundleContext bundleContext,
 		Predicate<FrameworkEvent> matches, int count, boolean immidiate) {
@@ -168,10 +170,10 @@ public class Events {
 	 * @param matches - Predicate that would be tested against the Events
 	 * @param immidiate - true start the Observer immediately. Could also be
 	 *            started later using start or waitFor method.
-	 * @return Observer<BundleEvent>
+	 * @return Observer<Optional<ServiceEvent>>
 	 */
 
-	public static Observer<ServiceEvent> newServiceEventObserver(BundleContext bundleContext,
+	public static Observer<Optional<ServiceEvent>> newServiceEventObserver(BundleContext bundleContext,
 		Predicate<ServiceEvent> matches, boolean immidiate) {
 		return new ServiceEventObserver.Single(bundleContext, matches, immidiate);
 	}
@@ -184,7 +186,7 @@ public class Events {
 	 * @param count - the among of matching events the Observer is waitFor
 	 * @param immidiate - true start the Observer immediately. Could also be
 	 *            started later using start or waitFor method.
-	 * @return Observer<BundleEvent>
+	 * @return Observer<ServiceEvent>
 	 */
 	public static Observer<List<ServiceEvent>> newServiceEventObserver(BundleContext bundleContext,
 		Predicate<ServiceEvent> matches, int count, boolean immidiate) {
