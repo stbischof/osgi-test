@@ -1,0 +1,40 @@
+java: java
+javac: javac
+javac.source: 1.8
+javac.target: 1.8
+
+# This is the version of JUnit that will be used at build time and runtime
+osgitest: org.osgi.test.junit5;version=latest,\
+	org.osgi.test.junit5.cm;version=latest,\
+	org.osgi.test.common;version=latest,\
+	org.osgi.test.assertj.framework;version=latest
+
+# This is the version of JUnit that will be used at build time and runtime
+junit: junit-jupiter-api;version="[5.7.0,6)",\
+	junit-jupiter-engine;version="[5.7.0,6)",\
+	junit-jupiter-params;version="[5.7.0,6)",\
+	junit-platform-runner;version="[1.7,2)",\
+	junit-platform-commons;version="[1.7,2)",\
+	junit-platform-launcher;version="[1.7,2)",\
+	junit-platform-testkit;version="[1.7,2)",\
+	assertj-core;version="[3.18,4)"
+
+# This is the version of Mockito that will be used at build time and run time
+mockito: org.mockito.mockito-core;version="[3.6,4)",\
+	org.objenesis;version="[3.1,4)"
+
+
+-testpath: ${junit},\
+  ${mockito},\
+  ${osgitest}
+
+Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+
+-tester: biz.aQute.tester.junit-platform
+
+
+-resolve.effective: active
+
+
+# define global blacklist
+-runblacklist.default: osgi.identity;filter:='(osgi.identity=osgi.cmpn)'
