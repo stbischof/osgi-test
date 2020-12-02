@@ -228,12 +228,8 @@ public class CloseableBundleContext implements AutoCloseable, InvocationHandler 
 	}
 
 	public Bundle installBundle(String location, InputStream input) throws BundleException {
-		Bundle bundle = bundleContext.getBundle(location);
-		if (bundle != null) {
-			return bundle;
-		} else {
-			bundle = bundleContext.installBundle(location, input);
-		}
+
+		Bundle bundle = bundleContext.installBundle(location, input);
 		bundles.add(bundle);
 		return bundle;
 	}
