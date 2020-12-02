@@ -97,20 +97,20 @@ public class InstallBundle_EmbeddedLocationTest {
 		softly
 			.assertThatThrownBy(
 				() -> InstallBundle.EmbeddedLocation.of(null, Version.parseVersion("1.1.1"), "/", "file.jar"))
-			.isInstanceOf(IllegalArgumentException.class);
+			.isInstanceOf(NullPointerException.class);
 
 		softly.assertThatThrownBy(() -> InstallBundle.EmbeddedLocation.of("bsn", null, "/", "file.jar"))
-			.isInstanceOf(IllegalArgumentException.class);
+			.isInstanceOf(NullPointerException.class);
 
 		softly
 			.assertThatThrownBy(
 				() -> InstallBundle.EmbeddedLocation.of("bsn", Version.parseVersion("1.1.1"), null, "file.jar"))
-			.isInstanceOf(IllegalArgumentException.class);
+			.isInstanceOf(NullPointerException.class);
 
 		softly
 			.assertThatThrownBy(
 				() -> InstallBundle.EmbeddedLocation.of("bsn", Version.parseVersion("1.1.1"), "/", null))
-			.isInstanceOf(IllegalArgumentException.class);
+			.isInstanceOf(NullPointerException.class);
 
 		softly.assertAll();
 	}

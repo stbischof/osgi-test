@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -101,7 +102,7 @@ public class InstallBundle {
 		 * at creation time.
 		 *
 		 * @param bundleContext
-		 * @param spec 'bundle.symbilic.name:1.2.3:/path/file.jar'
+		 * @param spec 'bundle.symbolic.name:1.2.3:/path/file.jar'
 		 *            <p>
 		 *            In minimum 'file.jar' must be used. Then it searches the
 		 *            file in the root of the BundelContexts bundle.
@@ -160,30 +161,18 @@ public class InstallBundle {
 			return new EmbeddedLocation(bundleSymbolicName, bundleVersion, path, file);
 		}
 
-		private String	bundleSymbolicName;
-
-		private Version	bundleVersion;
-
-		private String	file;
-		private String	path;
-
-		private EmbeddedLocation() {
-			// no access here.
-		}
+		private final String	bundleSymbolicName;
+		private final Version	bundleVersion;
+		private final String	file;
+		private final String	path;
 
 		private EmbeddedLocation(String bundleSymbolicName, Version bundleVersion, String path, String file) {
-			if (bundleSymbolicName == null) {
-				throw new IllegalArgumentException("bundleSymbolicName must not be null");
-			}
-			if (bundleVersion == null) {
-				throw new IllegalArgumentException("bundleVersion must not be null");
-			}
-			if (path == null) {
-				throw new IllegalArgumentException("path must not be null");
-			}
-			if (file == null) {
-				throw new IllegalArgumentException("file must not be null");
-			}
+
+			Objects.requireNonNull(bundleSymbolicName, "bundleSymbolicName must not be null");
+			Objects.requireNonNull(bundleVersion, "bundleVersion must not be null");
+			Objects.requireNonNull(path, "path must not be null");
+			Objects.requireNonNull(file, "file must not be null");
+
 			this.bundleSymbolicName = bundleSymbolicName;
 			this.bundleVersion = bundleVersion;
 
@@ -199,45 +188,18 @@ public class InstallBundle {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			EmbeddedLocation other = (EmbeddedLocation) obj;
-			if (bundleSymbolicName == null) {
-				if (other.bundleSymbolicName != null)
-					return false;
-			} else if (!bundleSymbolicName.equals(other.bundleSymbolicName))
-				return false;
-			if (bundleVersion == null) {
-				if (other.bundleVersion != null)
-					return false;
-			} else if (!bundleVersion.equals(other.bundleVersion))
-				return false;
-			if (file == null) {
-				if (other.file != null)
-					return false;
-			} else if (!file.equals(other.file))
-				return false;
-			if (path == null) {
-				if (other.path != null)
-					return false;
-			} else if (!path.equals(other.path))
-				return false;
-			return true;
+			if (obj instanceof EmbeddedLocation) {
+				EmbeddedLocation other = (EmbeddedLocation) obj;
+				return Objects.equals(bundleSymbolicName, other.bundleSymbolicName)
+					&& Objects.equals(bundleVersion, other.bundleVersion) && Objects.equals(file, other.file)
+					&& Objects.equals(path, other.path);
+			}
+			return false;
 		}
 
 		@Override
 		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((bundleSymbolicName == null) ? 0 : bundleSymbolicName.hashCode());
-			result = prime * result + ((bundleVersion == null) ? 0 : bundleVersion.hashCode());
-			result = prime * result + ((file == null) ? 0 : file.hashCode());
-			result = prime * result + ((path == null) ? 0 : path.hashCode());
-			return result;
+			return Objects.hash(bundleSymbolicName, bundleVersion, file, path);
 		}
 
 		public InputStream openStream(BundleContext bc) throws IOException, IllegalArgumentException {
