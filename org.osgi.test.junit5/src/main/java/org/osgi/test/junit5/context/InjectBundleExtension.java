@@ -118,10 +118,6 @@ public class InjectBundleExtension implements BeforeAllCallback, BeforeEachCallb
 	private Bundle getBundle(ExtensionContext extensionContext, InjectBundle injectBundle) {
 
 		return installBundleOf(injectBundle, extensionContext);
-		// TODO:: ASK BJ extra store? Should work with InnstallBundle only.
-		// return getStore(extensionContext).getOrComputeIfAbsent(injectBundle,
-		// key -> installBundleOf(key, extensionContext), Bundle.class);
-
 	}
 
 	private Bundle installBundleOf(InjectBundle injectBundle, ExtensionContext extensionContext) {
