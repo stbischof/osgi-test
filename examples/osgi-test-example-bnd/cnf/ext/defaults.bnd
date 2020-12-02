@@ -10,19 +10,21 @@ osgitest: org.osgi.test.junit5;version=latest,\
 	org.osgi.test.assertj.framework;version=latest
 
 # This is the version of JUnit that will be used at build time and runtime
-junit: junit-jupiter-api;version="[5.7.0,6)",\
-	junit-jupiter-engine;version="[5.7.0,6)",\
-	junit-jupiter-params;version="[5.7.0,6)",\
-	junit-platform-runner;version="[1.7,2)",\
-	junit-platform-commons;version="[1.7,2)",\
-	junit-platform-launcher;version="[1.7,2)",\
-	junit-platform-testkit;version="[1.7,2)",\
-	assertj-core;version="[3.18,4)"
+junit: junit-jupiter-api;version=latest,\
+	junit-jupiter-engine;version=latest,\
+	junit-jupiter-params;version=latest,\
+	junit-platform-runner;version=latest,\
+	junit-platform-commons;version=latest,\
+	junit-platform-launcher;version=latest,\
+	junit-platform-testkit;version=latest,\
+	assertj-core;version=latest
 
 # This is the version of Mockito that will be used at build time and run time
-mockito: org.mockito.mockito-core;version="[3.6,4)",\
-	org.objenesis;version="[3.1,4)"
-
+mockito: org.mockito.mockito-core;version=latest,\
+	org.objenesis;version=latest
+	
+# Needed for Mockito's mocking to work
+-runsystempackages.objenesis: sun.misc,sun.reflect
 
 -testpath: ${junit},\
   ${mockito},\
@@ -34,7 +36,3 @@ Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.
 
 
 -resolve.effective: active
-
-
-# define global blacklist
--runblacklist.default: osgi.identity;filter:='(osgi.identity=osgi.cmpn)'

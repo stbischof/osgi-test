@@ -38,7 +38,6 @@ org.slf4j:slf4j-ext:1.7.25
 org.slf4j:slf4j-jcl:1.7.25
 
 org.osgi:osgi.annotation:7.0.0
-org.osgi:osgi.cmpn:7.0.0
 org.osgi:osgi.core:7.0.0
 org.osgi:org.osgi.util.pushstream:1.0.0
 org.osgi:org.osgi.util.function:1.1.0
