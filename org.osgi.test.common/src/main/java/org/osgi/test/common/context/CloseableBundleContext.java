@@ -231,8 +231,8 @@ public class CloseableBundleContext implements AutoCloseable, InvocationHandler 
 
 		Bundle bundle = bundleContext.getBundle(location);
 		// Check whether the Bundle already exists because we should only add
-		// new bundles to the bundlesToBeUninstalledOnClose-list of this
-		// CloseableBundleContext. On close all Bundles in this list will be
+		// new bundles to the bundlesToBeUninstalledOnClose-Set of this
+		// CloseableBundleContext. On close all Bundles in this Set will be
 		// uninstalled. We are not allowed to uninstall bundles, that exist
 		// before. Same in installBundle(String location)
 		if (bundle == null) {
