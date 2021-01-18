@@ -7,8 +7,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.test.common.annotation.InjectBundleContext;
-import org.osgi.test.common.annotation.InjectInstallBundle;
-import org.osgi.test.common.install.InstallBundle;
+import org.osgi.test.common.annotation.InjectBundleInstaller;
+import org.osgi.test.common.install.BundleInstaller;
 import org.osgi.test.junit5.context.BundleContextExtension_CleanupTest.BundleChecker;
 
 @ExtendWith(PreDestroyCallback.class)
@@ -22,24 +22,24 @@ class InstallBundleMultiLevelCleanupTest extends MultiLevelCleanupTest {
 	@InjectBundleContext
 	BundleContext			bundleContext;
 
-	@InjectInstallBundle
-	static InstallBundle	staticIB;
+	@InjectBundleInstaller
+	static BundleInstaller	staticBI;
 
-	@InjectInstallBundle
-	InstallBundle			installBundle;
+	@InjectBundleInstaller
+	BundleInstaller			bundleInstaller;
 
 	static class InstallBundleChecker extends BundleChecker {
 
-		final InstallBundle ib;
+		final BundleInstaller bi;
 
-		public InstallBundleChecker(BundleContext bc, Map<CallbackPoint, Bundle> scopedResourcesMap, InstallBundle ib) {
+		public InstallBundleChecker(BundleContext bc, Map<CallbackPoint, Bundle> scopedResourcesMap, BundleInstaller bi) {
 			super(bc, scopedResourcesMap);
-			this.ib = ib;
+			this.bi = bi;
 		}
 
 		@Override
 		public Bundle doSetupResource(CallbackPoint inScope) {
-			return ib.installBundle(inScope.toString()
+			return bi.installBundle(inScope.toString()
 				.replace(".", "/") + ".jar");
 		}
 	}
@@ -47,17 +47,17 @@ class InstallBundleMultiLevelCleanupTest extends MultiLevelCleanupTest {
 	@SuppressWarnings("unchecked")
 	static InstallBundleChecker getGlobalResourceChecker() {
 		return new InstallBundleChecker(bundle.getBundleContext(), (Map<CallbackPoint, Bundle>) resourcesMap,
-			new InstallBundle(bundle.getBundleContext()));
+			new BundleInstaller(bundle.getBundleContext()));
 	}
 
 	@SuppressWarnings("unchecked")
 	static InstallBundleChecker getStaticResourceChecker() {
-		return new InstallBundleChecker(staticBC, (Map<CallbackPoint, Bundle>) resourcesMap, staticIB);
+		return new InstallBundleChecker(staticBC, (Map<CallbackPoint, Bundle>) resourcesMap, staticBI);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	InstallBundleChecker getResourceChecker() {
-		return new InstallBundleChecker(bundleContext, (Map<CallbackPoint, Bundle>) resourcesMap, installBundle);
+		return new InstallBundleChecker(bundleContext, (Map<CallbackPoint, Bundle>) resourcesMap, bundleInstaller);
 	}
 }

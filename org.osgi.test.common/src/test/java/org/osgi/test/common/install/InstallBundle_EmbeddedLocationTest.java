@@ -27,7 +27,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.Version;
-import org.osgi.test.common.install.InstallBundle.EmbeddedLocation;
+import org.osgi.test.common.install.BundleInstaller.EmbeddedLocation;
 
 public class InstallBundle_EmbeddedLocationTest {
 
@@ -55,7 +55,7 @@ public class InstallBundle_EmbeddedLocationTest {
 		SoftAssertions softly = new SoftAssertions();
 		for (String spec : specs) {
 			System.out.println(spec);
-			EmbeddedLocation location = InstallBundle.EmbeddedLocation.of(bc, spec);
+			EmbeddedLocation location = BundleInstaller.EmbeddedLocation.of(bc, spec);
 			softly.assertThat(location)
 				.isNotNull()
 				.as("With Spec %s", spec)
@@ -81,7 +81,7 @@ public class InstallBundle_EmbeddedLocationTest {
 		softly = new SoftAssertions();
 		for (String spec : specs) {
 			System.out.println(spec);
-			EmbeddedLocation location = InstallBundle.EmbeddedLocation.of(bc, spec);
+			EmbeddedLocation location = BundleInstaller.EmbeddedLocation.of(bc, spec);
 
 			assertThat(location).isNotNull()
 				.as("With Spec %s", spec)
@@ -96,20 +96,20 @@ public class InstallBundle_EmbeddedLocationTest {
 
 		softly
 			.assertThatThrownBy(
-				() -> InstallBundle.EmbeddedLocation.of(null, Version.parseVersion("1.1.1"), "/", "file.jar"))
+				() -> BundleInstaller.EmbeddedLocation.of(null, Version.parseVersion("1.1.1"), "/", "file.jar"))
 			.isInstanceOf(NullPointerException.class);
 
-		softly.assertThatThrownBy(() -> InstallBundle.EmbeddedLocation.of("bsn", null, "/", "file.jar"))
-			.isInstanceOf(NullPointerException.class);
-
-		softly
-			.assertThatThrownBy(
-				() -> InstallBundle.EmbeddedLocation.of("bsn", Version.parseVersion("1.1.1"), null, "file.jar"))
+		softly.assertThatThrownBy(() -> BundleInstaller.EmbeddedLocation.of("bsn", null, "/", "file.jar"))
 			.isInstanceOf(NullPointerException.class);
 
 		softly
 			.assertThatThrownBy(
-				() -> InstallBundle.EmbeddedLocation.of("bsn", Version.parseVersion("1.1.1"), "/", null))
+				() -> BundleInstaller.EmbeddedLocation.of("bsn", Version.parseVersion("1.1.1"), null, "file.jar"))
+			.isInstanceOf(NullPointerException.class);
+
+		softly
+			.assertThatThrownBy(
+				() -> BundleInstaller.EmbeddedLocation.of("bsn", Version.parseVersion("1.1.1"), "/", null))
 			.isInstanceOf(NullPointerException.class);
 
 		softly.assertAll();

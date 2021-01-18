@@ -27,8 +27,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.osgi.framework.BundleContext;
 import org.osgi.test.common.annotation.InjectBundleContext;
-import org.osgi.test.common.annotation.InjectInstallBundle;
-import org.osgi.test.common.install.InstallBundle;
+import org.osgi.test.common.annotation.InjectBundleInstaller;
+import org.osgi.test.common.install.BundleInstaller;
 
 /**
  * This is how a real test class should use {@link BundleContextExtension}.
@@ -104,22 +104,23 @@ public class BundleContextExtensionExampleTest {
 
 	}
 
-	// InstallBundle injection
+	// BundleInstaller injection
 
 	@Test
-	public void testInstallBundle(@InjectInstallBundle InstallBundle installBundle1) {
-		assertThat(installBundle1).isNotNull()
-			.isSameAs(installBundle2);
+	public void testBundleInstaller(@InjectBundleInstaller
+	BundleInstaller bundleInstaller1) {
+		assertThat(bundleInstaller1).isNotNull()
+			.isSameAs(bundleInstaller2);
 	}
 
 	// OR
 
-	@InjectInstallBundle
-	InstallBundle installBundle2;
+	@InjectBundleInstaller
+	BundleInstaller bundleInstaller2;
 
 	@Test
-	public void testInstallBundle() {
-		assertThat(installBundle2).isNotNull();
+	public void testBundleInstaller() {
+		assertThat(bundleInstaller2).isNotNull();
 	}
 
 }

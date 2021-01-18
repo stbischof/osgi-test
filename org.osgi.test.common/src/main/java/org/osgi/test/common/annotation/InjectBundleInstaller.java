@@ -25,28 +25,38 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.osgi.test.common.install.BundleInstaller;
+
+/**
+ * Inject {@link BundleInstaller} into test classes and methods.
+ * <p>
+ * The {@link BundleInstaller} implementation provided by this rule simplifies
+ * installation of embedded bundles.
+ * <p>
+ * Example:
+ *
+ * <pre>
+ * // For JUnit5
+ * &#64;ExtendWith(BundleContextExtension.class)
+ * class MyTests {
+ * 	// For JUnit4
+ * 	&#64;Rule
+ * 	BundleContextRule bcr = new BundleContextRule();
+ *
+ * 	&#64;InjectBundleInstaller
+ * 	BundleInstaller bundleInstaller;
+ *
+ * 	&#64;Test
+ * 	public void test() {
+ * 		// use bundleInstaller
+ * 	}
+ * }
+ * </pre>
+ */
 @Inherited
 @Target({
 	FIELD, PARAMETER
 })
 @Retention(RUNTIME)
 @Documented
-public @interface InjectBundle {
-
-	/**
-	 * @return value that would be processed in condition to the @sourceType
-	 *         bundle:<bsn> (if bsn is empty, resolves to the current bundle)
-	 *         <br>
-	 *         bundle:<bsn>/path/to.jar for an embedded bundle (again, if bsn is
-	 *         empty, resolves to the current bundle).<br>
-	 *         file:/path/to.jar
-	 */
-	String value();
-
-	/**
-	 * @return start if true, indicates to start the bundle
-	 */
-	boolean start() default false;
-
-
-}
+public @interface InjectBundleInstaller {}

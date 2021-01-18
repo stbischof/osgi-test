@@ -31,7 +31,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
 
-public class InstallBundle {
+public class BundleInstaller {
 
 	/**
 	 * EmbeddedLocation describes a Location of a File inside a Bundle.
@@ -232,7 +232,7 @@ public class InstallBundle {
 
 	private final BundleContext bundleContext;
 
-	public InstallBundle(BundleContext bundleContext) {
+	public BundleInstaller(BundleContext bundleContext) {
 		this.bundleContext = bundleContext;
 	}
 
