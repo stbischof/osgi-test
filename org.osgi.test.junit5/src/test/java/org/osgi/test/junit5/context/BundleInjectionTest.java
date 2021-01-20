@@ -14,14 +14,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
-import org.osgi.test.common.annotation.InjectInstallBundle;
+import org.osgi.test.common.annotation.InjectInstalledBundle;
 import org.osgi.test.common.annotation.InjectBundleContext;
 import org.osgi.test.common.annotation.InjectBundleInstaller;
 import org.osgi.test.common.install.BundleInstaller;
 import org.osgi.test.common.install.BundleInstaller.EmbeddedLocation;
 import org.osgi.test.junit5.testutils.OSGiSoftAssertions;
 
-@ExtendWith(InjectBundleExtension.class)
+@ExtendWith(InstalledBundleExtension.class)
 @ExtendWith(BundleContextExtension.class)
 public class BundleInjectionTest {
 
@@ -34,10 +34,10 @@ public class BundleInjectionTest {
 	@InjectBundleInstaller
 	static BundleInstaller		bI;
 
-	@InjectInstallBundle(TB1_JAR)
+	@InjectInstalledBundle(TB1_JAR)
 	static volatile Bundle		bundleFieldStatic;
 
-	@InjectInstallBundle(TB1_JAR)
+	@InjectInstalledBundle(TB1_JAR)
 	Bundle						bundleField;
 
 	static OSGiSoftAssertions	staticSoftly;
@@ -45,7 +45,7 @@ public class BundleInjectionTest {
 	OSGiSoftAssertions			softly;
 
 	@BeforeAll
-	static void beforeAll(@InjectInstallBundle(TB1_JAR) Bundle bundleParam) {
+	static void beforeAll(@InjectInstalledBundle(TB1_JAR) Bundle bundleParam) {
 		assertThat(bI).isNotNull();
 		Bundle iBBundle = bI.installBundle(TB1_JAR, false);
 
@@ -61,7 +61,7 @@ public class BundleInjectionTest {
 	}
 
 	@BeforeEach
-	void beforeEach(@InjectInstallBundle(TB1_JAR) Bundle bundleParam) {
+	void beforeEach(@InjectInstalledBundle(TB1_JAR) Bundle bundleParam) {
 		Bundle iBBundle = bI.installBundle(TB1_JAR, false);
 		assertThat(bundleParam).isNotNull();
 		softly = new OSGiSoftAssertions();
@@ -75,7 +75,7 @@ public class BundleInjectionTest {
 	}
 
 	@Test
-	void innerTest(@InjectInstallBundle(TB1_JAR) Bundle bundleParam) {
+	void innerTest(@InjectInstalledBundle(TB1_JAR) Bundle bundleParam) {
 
 		assertThat(bI).isNotNull();
 		Bundle iBBundle = bI.installBundle(TB1_JAR, false);
@@ -106,7 +106,7 @@ public class BundleInjectionTest {
 	}
 
 	@AfterEach
-	void afterEach(@InjectInstallBundle(TB1_JAR) Bundle bundleParam) {
+	void afterEach(@InjectInstalledBundle(TB1_JAR) Bundle bundleParam) {
 		assertThat(bI).isNotNull();
 		Bundle iBBundle = bI.installBundle(TB1_JAR, false);
 		softly = new OSGiSoftAssertions();
@@ -120,7 +120,7 @@ public class BundleInjectionTest {
 	}
 
 	@AfterAll
-	static void afterAll(@InjectInstallBundle(TB1_JAR) Bundle bundleParam) {
+	static void afterAll(@InjectInstalledBundle(TB1_JAR) Bundle bundleParam) {
 
 		assertThat(bI).isNotNull();
 		Bundle iBBundle = bI.installBundle(TB1_JAR, false);

@@ -41,23 +41,34 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.test.common.annotation.InjectInstallBundle;
 import org.osgi.test.common.annotation.InjectBundleContext;
 import org.osgi.test.common.annotation.InjectBundleInstaller;
+import org.osgi.test.common.annotation.InjectInstalledBundle;
 import org.osgi.test.common.install.BundleInstaller;
 
-public class InjectBundleExtension implements BeforeAllCallback, BeforeEachCallback, ParameterResolver {
+/**
+ * This Extension loads a {@link Bundle} from a given location and installs the
+ * Bundle using the {@link InjectInstalledBundle}.
+ *
+ * <pre>
+ * &#64;ExtendWith(InstalledBundleExtension.class)
+ * ...
+ * &#64;InjectInstalledBundle
+ * Bundle installedBundle;
+ * </pre>
+ */
+public class InstalledBundleExtension implements BeforeAllCallback, BeforeEachCallback, ParameterResolver {
 
 	@Override
 	public void beforeAll(ExtensionContext extensionContext) throws Exception {
 		List<Field>
 
-		fields = findAnnotatedFields(extensionContext.getRequiredTestClass(), InjectInstallBundle.class,
+		fields = findAnnotatedFields(extensionContext.getRequiredTestClass(), InjectInstalledBundle.class,
 			m -> Modifier.isStatic(m.getModifiers()));
 
 		fields.forEach(field -> {
-			assertFieldIsOfType(field, Bundle.class, InjectInstallBundle.class, ExtensionConfigurationException::new);
-			InjectInstallBundle injectBundle = field.getAnnotation(InjectInstallBundle.class);
+			assertFieldIsOfType(field, Bundle.class, InjectInstalledBundle.class, ExtensionConfigurationException::new);
+			InjectInstalledBundle injectBundle = field.getAnnotation(InjectInstalledBundle.class);
 			setField(field, null, getBundle(extensionContext, injectBundle));
 		});
 	}
@@ -68,11 +79,11 @@ public class InjectBundleExtension implements BeforeAllCallback, BeforeEachCallb
 			.getAllInstances()) {
 			final Class<?> testClass = instance.getClass();
 
-			List<Field> fields = findAnnotatedNonStaticFields(testClass, InjectInstallBundle.class);
+			List<Field> fields = findAnnotatedNonStaticFields(testClass, InjectInstalledBundle.class);
 
 			fields.forEach(field -> {
-				assertFieldIsOfType(field, Bundle.class, InjectInstallBundle.class, ExtensionConfigurationException::new);
-				InjectInstallBundle injectBundle = field.getAnnotation(InjectInstallBundle.class);
+				assertFieldIsOfType(field, Bundle.class, InjectInstalledBundle.class, ExtensionConfigurationException::new);
+				InjectInstalledBundle injectBundle = field.getAnnotation(InjectInstalledBundle.class);
 				setField(field, instance, getBundle(extensionContext, injectBundle));
 			});
 		}
@@ -89,9 +100,9 @@ public class InjectBundleExtension implements BeforeAllCallback, BeforeEachCallb
 		Parameter parameter = parameterContext.getParameter();
 		Class<?> parameterType = parameter.getType();
 
-		if (parameterContext.isAnnotated(InjectInstallBundle.class)) {
-			assertParameterIsOfType(parameterType, Bundle.class, InjectInstallBundle.class, ParameterResolutionException::new);
-			InjectInstallBundle injectBundle = parameter.getAnnotation(InjectInstallBundle.class);
+		if (parameterContext.isAnnotated(InjectInstalledBundle.class)) {
+			assertParameterIsOfType(parameterType, Bundle.class, InjectInstalledBundle.class, ParameterResolutionException::new);
+			InjectInstalledBundle injectBundle = parameter.getAnnotation(InjectInstalledBundle.class);
 			return getBundle(extensionContext, injectBundle);
 		}
 
@@ -106,7 +117,7 @@ public class InjectBundleExtension implements BeforeAllCallback, BeforeEachCallb
 	 */
 	@Override
 	public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
-		boolean annotatedBundleParameter = parameterContext.isAnnotated(InjectInstallBundle.class);
+		boolean annotatedBundleParameter = parameterContext.isAnnotated(InjectInstalledBundle.class);
 
 		if (annotatedBundleParameter && (parameterContext.getDeclaringExecutable() instanceof Constructor)) {
 			throw new ParameterResolutionException(
@@ -115,12 +126,12 @@ public class InjectBundleExtension implements BeforeAllCallback, BeforeEachCallb
 		return annotatedBundleParameter;
 	}
 
-	private Bundle getBundle(ExtensionContext extensionContext, InjectInstallBundle injectBundle) {
+	private Bundle getBundle(ExtensionContext extensionContext, InjectInstalledBundle injectBundle) {
 
 		return installBundleOf(injectBundle, extensionContext);
 	}
 
-	private Bundle installBundleOf(InjectInstallBundle injectBundle, ExtensionContext extensionContext) {
+	private Bundle installBundleOf(InjectInstalledBundle injectBundle, ExtensionContext extensionContext) {
 
 		try {
 			BundleContext bc = BundleContextExtension.getBundleContext(extensionContext);
@@ -140,7 +151,7 @@ public class InjectBundleExtension implements BeforeAllCallback, BeforeEachCallb
 	}
 
 	static Store getStore(ExtensionContext extensionContext) {
-		return extensionContext.getStore(Namespace.create(InjectBundleExtension.class, extensionContext.getUniqueId()));
+		return extensionContext.getStore(Namespace.create(InstalledBundleExtension.class, extensionContext.getUniqueId()));
 	}
 
 }

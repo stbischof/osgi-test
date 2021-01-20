@@ -25,13 +25,21 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+/**
+ * Loads a Bundle from a given location and installs the Bundle.
+ *
+ * <pre>
+ * &#64;InjectInstalledBundle
+ * Bundle installedBundle;
+ * </pre>
+ */
 @Inherited
 @Target({
 	FIELD, PARAMETER
 })
 @Retention(RUNTIME)
 @Documented
-public @interface InjectInstallBundle {
+public @interface InjectInstalledBundle {
 
 	/**
 	 * @return value that would be processed in condition to the @sourceType
@@ -47,6 +55,5 @@ public @interface InjectInstallBundle {
 	 * @return start if true, indicates to start the bundle
 	 */
 	boolean start() default false;
-
 
 }
