@@ -1,5 +1,5 @@
 /*
- * Copyright (c) OSGi Alliance (2020). All Rights Reserved.
+ * Copyright (c) OSGi Alliance (2020, 2021). All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.osgi.test.common.bitmaps;
 
 import java.util.Map;
+import java.util.function.BiPredicate;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -51,11 +52,9 @@ public class Bitmap {
 	}
 
 	public Bitmap(Map<Integer, String> mapping) {
-		this(mapping
-			.keySet()
+		this(mapping.keySet()
 			.stream()
-			.mapToInt(
-				Integer::intValue)
+			.mapToInt(Integer::intValue)
 			.sorted()
 			.toArray(), mapping::get);
 	}
@@ -114,8 +113,7 @@ public class Bitmap {
 	 * @see #toString(int)
 	 */
 	public String maskToString(int mask) {
-		Stream<String> bits = IntStream.of(
-			types)
+		Stream<String> bits = IntStream.of(types)
 			.filter(x -> (x & mask) != 0)
 			.mapToObj(this::toString);
 
@@ -123,5 +121,13 @@ public class Bitmap {
 			bits = Stream.concat(bits, Stream.of("UNKNOWN"));
 		}
 		return mask + ":" + bits.collect(Collectors.joining(" | "));
+	}
+
+	public static BiPredicate<Integer, Integer> typeMatchesMask() {
+		return (type, mask) -> (type & mask) != 0;
+	}
+
+	public static boolean typeMatchesMask(int type, int mask) {
+		return typeMatchesMask().test(type, mask);
 	}
 }
