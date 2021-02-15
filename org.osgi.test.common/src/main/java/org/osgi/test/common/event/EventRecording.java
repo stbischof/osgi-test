@@ -31,6 +31,7 @@ import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
+import org.osgi.framework.SynchronousBundleListener;
 
 public interface EventRecording {
 	boolean isTimedOut();
@@ -140,7 +141,7 @@ public interface EventRecording {
 		List<TimedEvent<?>> events = Collections.synchronizedList(new ArrayList<>());
 		CountDownLatch latch = new CountDownLatch(1);
 
-		BundleListener bListener = new BundleListener() {
+		BundleListener bListener = new SynchronousBundleListener() {
 
 			@Override
 			public void bundleChanged(BundleEvent event) {
