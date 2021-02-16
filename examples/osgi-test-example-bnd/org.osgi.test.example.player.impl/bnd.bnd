@@ -1,0 +1,7 @@
+# Build dependencies 
+-buildpath: \
+	osgi.annotation,\
+	org.osgi.test.example.api;version=latest,\
+	osgi.cmpn
+
+Bundle-Version: 0.0.0.${tstamp}

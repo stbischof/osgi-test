@@ -1,0 +1,17 @@
+# Build dependencies 
+-buildpath: \
+	${junit},\
+	${mockito},\
+	${osgitest},\
+	osgi.annotation;version='7.0',\
+	osgi.core;version='6.0',\
+	junit-jupiter-api;version='5.7.0',\
+	org.osgi.test.example.api,\
+	osgi.cmpn,\
+	org.apiguardian:apiguardian-api
+
+
+Bundle-Version: 0.0.0.${tstamp}
+
+# This would execute the bndrun while Gradle build
+-include:  test.bndrun

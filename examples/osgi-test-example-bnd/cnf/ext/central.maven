@@ -3,8 +3,8 @@ org.osgi:org.osgi.test.junit5.cm:0.10.0
 org.osgi:org.osgi.test.common:0.10.0
 org.osgi:org.osgi.test.assertj.framework:0.10.0
 org.assertj:assertj-core:3.18.0
-org.mockito:mockito-core:3.6.0
-org.mockito:mockito-junit-jupiter:3.6.0
+org.mockito:mockito-core:3.7.7
+org.mockito:mockito-junit-jupiter:3.7.7
 org.junit.jupiter:junit-jupiter-api:5.7.0
 org.junit.jupiter:junit-jupiter-engine:5.7.0
 org.junit.jupiter:junit-jupiter-params:5.7.0
@@ -15,18 +15,18 @@ org.junit.platform:junit-platform-engine:1.7.0
 org.junit.platform:junit-platform-testkit:1.7.0
 org.opentest4j:opentest4j:1.2.0
 biz.aQute.bnd:biz.aQute.tester.junit-platform:5.2.0
-biz.aQute.bnd:bnd-testing-maven-plugin:5.2.0
 org.objenesis:objenesis:3.1
+net.bytebuddy:byte-buddy:1.10.19
+net.bytebuddy:byte-buddy-agent:1.10.19
 
 org.apache.felix:org.apache.felix.scr:2.1.16
 org.apache.felix:org.apache.felix.configadmin:1.9.16
-org.apache.felix:org.apache.felix.framework:6.0.1
 
 org.apache.felix:org.apache.felix.log:1.2.0
 org.apache.felix:org.apache.felix.logback:1.0.0
 org.apache.felix:org.apache.felix.metatype:1.2.2
 
-#org.apache.servicemix.bundles:org.apache.servicemix.bundles.junit:4.12_1
+org.apache.servicemix.bundles:org.apache.servicemix.bundles.junit:4.12_1
 
 ch.qos.logback:logback-classic:1.2.3
 ch.qos.logback:logback-core:1.2.3
@@ -39,6 +39,11 @@ org.slf4j:slf4j-jcl:1.7.25
 
 org.osgi:osgi.annotation:7.0.0
 org.osgi:osgi.core:7.0.0
+org.osgi:osgi.cmpn:7.0.0
 org.osgi:org.osgi.util.pushstream:1.0.0
 org.osgi:org.osgi.util.function:1.1.0
 org.osgi:org.osgi.util.promise:1.1.0
+
+org.eclipse.platform:org.eclipse.osgi:3.16.100
+
+org.apiguardian:apiguardian-api:jar:1.1.1

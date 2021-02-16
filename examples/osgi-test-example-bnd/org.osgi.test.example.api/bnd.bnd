@@ -1,0 +1,4 @@
+# Build dependencies 
+-buildpath: osgi.annotation
+
+Bundle-Version: 0.0.0.${tstamp}

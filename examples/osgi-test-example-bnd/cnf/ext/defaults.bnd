@@ -1,7 +1,7 @@
 java: java
 javac: javac
-javac.source: 1.8
-javac.target: 1.8
+javac.source: 11
+javac.target: 11
 
 # This is the version of JUnit that will be used at build time and runtime
 osgitest: org.osgi.test.junit5;version=latest,\
@@ -26,13 +26,8 @@ mockito: org.mockito.mockito-core;version=latest,\
 # Needed for Mockito's mocking to work
 -runsystempackages.objenesis: sun.misc,sun.reflect
 
--testpath: ${junit},\
-  ${mockito},\
-  ${osgitest}
-
 Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
 
 -tester: biz.aQute.tester.junit-platform
-
 
 -resolve.effective: active
