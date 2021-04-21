@@ -34,17 +34,18 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.framework.ServiceReference;
 
 public class CloseableBundleContextTest extends SoftAssertions {
-	BundleContext			upstream;
+	Bundle			upstream;
 	BundleContext			sut;
 
 	@BeforeEach
 	void beforeEach() {
-		upstream = mock(BundleContext.class);
+		upstream = mock(Bundle.class);
 		sut = CloseableBundleContext.proxy(upstream);
 	}
 
@@ -79,6 +80,7 @@ public class CloseableBundleContextTest extends SoftAssertions {
 
 	@Nested
 	class CloseableServiceObjectsTest {
+		BundleContext			upstreamBC;
 		ServiceObjects<Object>	upstreamSO;
 		ServiceObjects<Object>	sutSO;
 		AutoCloseable			sutSOCloseable;
@@ -89,9 +91,11 @@ public class CloseableBundleContextTest extends SoftAssertions {
 		@SuppressWarnings("unchecked")
 		@BeforeEach
 		void beforeEach() {
+			upstreamBC = mock(BundleContext.class);
+			when(upstream.getBundleContext()).thenReturn(upstreamBC);
 			upstreamSO = mock(ServiceObjects.class);
 			when(upstreamSO.getService()).thenReturn(s1, s2, s1, s2);
-			when(upstream.getServiceObjects(any(ServiceReference.class))).thenReturn(upstreamSO);
+			when(upstreamBC.getServiceObjects(any(ServiceReference.class))).thenReturn(upstreamSO);
 			sutSO = sut.getServiceObjects(mock(ServiceReference.class));
 			Assertions.assertThat(sutSO)
 				.isInstanceOf(AutoCloseable.class);

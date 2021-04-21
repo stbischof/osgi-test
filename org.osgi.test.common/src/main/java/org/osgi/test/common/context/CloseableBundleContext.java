@@ -67,7 +67,7 @@ public class CloseableBundleContext implements AutoCloseable, InvocationHandler 
 	static final ClassLoader												PROXY_CLASS_LOADER				= CloseableBundleContext.class
 		.getClassLoader();
 
-	private final BundleContext												bundleContext;
+	private final Bundle													bundle;
 	private final Set<ServiceRegistration<?>>								regs							= Collections
 		.synchronizedSet(Collections.newSetFromMap(new IdentityHashMap<>()));
 	private final Set<FrameworkListener>									fwListeners						= Collections
@@ -131,14 +131,14 @@ public class CloseableBundleContext implements AutoCloseable, InvocationHandler 
 		}
 	}
 
-	public static BundleContext proxy(BundleContext bundleContext) {
+	public static BundleContext proxy(Bundle bundle) {
 		return (BundleContext) Proxy.newProxyInstance(PROXY_CLASS_LOADER, new Class<?>[] {
 			BundleContext.class, AutoCloseable.class
-		}, new CloseableBundleContext(bundleContext));
+		}, new CloseableBundleContext(bundle));
 	}
 
-	public CloseableBundleContext(BundleContext bundleContext) {
-		this.bundleContext = bundleContext;
+	public CloseableBundleContext(Bundle bundle) {
+		this.bundle = bundle;
 	}
 
 	@Override
@@ -168,9 +168,9 @@ public class CloseableBundleContext implements AutoCloseable, InvocationHandler 
 		if (closeableBundleContext == null) {
 			return null;
 		}
-		BundleContext real = closeableBundleContext.bundleContext;
+		BundleContext real = closeableBundleContext.bundleContext();
 		while ((closeableBundleContext = closeableBundleContext(real)) != null) {
-			real = closeableBundleContext.bundleContext;
+			real = closeableBundleContext.bundleContext();
 		}
 		return real;
 	}
@@ -189,7 +189,7 @@ public class CloseableBundleContext implements AutoCloseable, InvocationHandler 
 
 		services.forEach((reference, useCount) -> {
 			for (int i = useCount; i > 0; i--) {
-				bundleContext.ungetService(reference);
+				bundleContext().ungetService(reference);
 			}
 		});
 		services.clear();
@@ -202,13 +202,13 @@ public class CloseableBundleContext implements AutoCloseable, InvocationHandler 
 		regs.forEach(unregisterService);
 		regs.clear();
 
-		bListeners.forEach(bundleContext::removeBundleListener);
+		bListeners.forEach(bundleContext()::removeBundleListener);
 		bListeners.clear();
 
-		sListeners.forEach(bundleContext::removeServiceListener);
+		sListeners.forEach(bundleContext()::removeServiceListener);
 		sListeners.clear();
 
-		fwListeners.forEach(bundleContext::removeFrameworkListener);
+		fwListeners.forEach(bundleContext()::removeFrameworkListener);
 		fwListeners.clear();
 	}
 
@@ -231,14 +231,14 @@ public class CloseableBundleContext implements AutoCloseable, InvocationHandler 
 
 	public Bundle installBundle(String location, InputStream input) throws BundleException {
 
-		Bundle bundle = bundleContext.getBundle(location);
+		Bundle bundle = bundleContext().getBundle(location);
 		// Check whether the Bundle already exists because we should only add
 		// new bundles to the bundlesToBeUninstalledOnClose-Set of this
 		// CloseableBundleContext. On close all Bundles in this Set will be
 		// uninstalled. We are not allowed to uninstall bundles, that exist
 		// before. Same in installBundle(String location)
 		if (bundle == null) {
-			bundle = bundleContext.installBundle(location, input);
+			bundle = bundleContext().installBundle(location, input);
 			bundlesToBeUninstalledOnClose.add(bundle);
 		}
 		return bundle;
@@ -246,84 +246,84 @@ public class CloseableBundleContext implements AutoCloseable, InvocationHandler 
 
 	public Bundle installBundle(String location) throws BundleException {
 
-		Bundle bundle = bundleContext.getBundle(location);
+		Bundle bundle = bundleContext().getBundle(location);
 		// see installBundle(String location, InputStream input)
 		if (bundle == null) {
-			bundle = bundleContext.installBundle(location);
+			bundle = bundleContext().installBundle(location);
 			bundlesToBeUninstalledOnClose.add(bundle);
 		}
 		return bundle;
 	}
 
 	public void addServiceListener(ServiceListener listener, String filter) throws InvalidSyntaxException {
-		bundleContext.addServiceListener(listener, filter);
+		bundleContext().addServiceListener(listener, filter);
 		sListeners.add(listener);
 	}
 
 	public void addServiceListener(ServiceListener listener) {
-		bundleContext.addServiceListener(listener);
+		bundleContext().addServiceListener(listener);
 		sListeners.add(listener);
 	}
 
 	public void removeServiceListener(ServiceListener listener) {
-		bundleContext.removeServiceListener(listener);
+		bundleContext().removeServiceListener(listener);
 		sListeners.remove(listener);
 	}
 
 	public void addBundleListener(BundleListener listener) {
-		bundleContext.addBundleListener(listener);
+		bundleContext().addBundleListener(listener);
 		bListeners.add(listener);
 	}
 
 	public void removeBundleListener(BundleListener listener) {
-		bundleContext.removeBundleListener(listener);
+		bundleContext().removeBundleListener(listener);
 		bListeners.remove(listener);
 	}
 
 	public void addFrameworkListener(FrameworkListener listener) {
-		bundleContext.addFrameworkListener(listener);
+		bundleContext().addFrameworkListener(listener);
 		fwListeners.add(listener);
 	}
 
 	public void removeFrameworkListener(FrameworkListener listener) {
-		bundleContext.removeFrameworkListener(listener);
+		bundleContext().removeFrameworkListener(listener);
 		fwListeners.remove(listener);
 	}
 
 	public <S> S getService(ServiceReference<S> reference) {
-		S service = bundleContext.getService(reference);
+		S service = bundleContext().getService(reference);
 		Integer count = services.merge(reference, 1, (oldValue, dummy) -> oldValue + 1);
 		return service;
 	}
 
 	public <S> ServiceObjects<S> getServiceObjects(ServiceReference<S> reference) {
-		final ServiceObjects<S> so = bundleContext.getServiceObjects(reference);
+		final ServiceObjects<S> so = bundleContext().getServiceObjects(reference);
 		ServiceObjects<S> serviceObjects = CloseableServiceObjects.proxy(so);
 		serviceobjects.add(serviceObjects);
 		return serviceObjects;
 	}
 
 	public ServiceRegistration<?> registerService(String[] clazzes, Object service, Dictionary<String, ?> properties) {
-		ServiceRegistration<?> reg = bundleContext.registerService(clazzes, service, properties);
+		ServiceRegistration<?> reg = bundleContext().registerService(clazzes, service, properties);
 		regs.add(reg);
 		return reg;
 	}
 
 	public ServiceRegistration<?> registerService(String clazz, Object service, Dictionary<String, ?> properties) {
-		ServiceRegistration<?> reg = bundleContext.registerService(clazz, service, properties);
+		ServiceRegistration<?> reg = bundleContext().registerService(clazz, service, properties);
 		regs.add(reg);
 		return reg;
 	}
 
 	public <S> ServiceRegistration<S> registerService(Class<S> clazz, S service, Dictionary<String, ?> properties) {
-		ServiceRegistration<S> reg = bundleContext.registerService(clazz, service, properties);
+		ServiceRegistration<S> reg = bundleContext().registerService(clazz, service, properties);
 		regs.add(reg);
 		return reg;
 	}
 
 	public <S> ServiceRegistration<S> registerService(Class<S> clazz, ServiceFactory<S> factory,
 		Dictionary<String, ?> properties) {
-		ServiceRegistration<S> reg = bundleContext.registerService(clazz, factory, properties);
+		ServiceRegistration<S> reg = bundleContext().registerService(clazz, factory, properties);
 		regs.add(reg);
 		return reg;
 	}
@@ -336,9 +336,13 @@ public class CloseableBundleContext implements AutoCloseable, InvocationHandler 
 			return oldValue - 1;
 		});
 		if (count != null) {
-			bundleContext.ungetService(reference);
+			bundleContext().ungetService(reference);
 			return true;
 		}
 		return false;
+	}
+
+	public BundleContext bundleContext() {
+		return bundle.getBundleContext();
 	}
 }

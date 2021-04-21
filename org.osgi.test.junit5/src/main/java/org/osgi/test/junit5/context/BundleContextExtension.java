@@ -193,7 +193,7 @@ public class BundleContextExtension implements BeforeAllCallback, BeforeEachCall
 		private final BundleContext bundleContext;
 
 		CloseableResourceBundleContext(BundleContext bundleContext) {
-			this.bundleContext = CloseableBundleContext.proxy(bundleContext);
+			this.bundleContext = CloseableBundleContext.proxy(bundleContext.getBundle());
 		}
 
 		@Override
