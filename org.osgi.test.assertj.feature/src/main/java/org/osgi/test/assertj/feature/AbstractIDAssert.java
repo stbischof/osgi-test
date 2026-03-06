@@ -18,6 +18,8 @@
 
 package org.osgi.test.assertj.feature;
 
+import java.util.Objects;
+
 import org.assertj.core.api.AbstractObjectAssert;
 import org.osgi.service.feature.ID;
 
@@ -48,7 +50,13 @@ public abstract class AbstractIDAssert<S extends AbstractIDAssert<S, A>, A exten
 	 *             the given one.
 	 */
 	public S hasArtifactId(String artifactId) {
-		return isNotNull().has(FeaturesConditions.IDConditions.artifactId(artifactId));
+		isNotNull();
+		if (!Objects.equals(actual.getArtifactId(), artifactId)) {
+			throw failureWithActualExpected(actual.getArtifactId(), artifactId,
+				"%nExpecting%n  <%s>%nto have artifactId:%n  <%s>%nbut was:%n  <%s>", actual, artifactId,
+				actual.getArtifactId());
+		}
+		return myself;
 	}
 
 	/**
@@ -61,9 +69,15 @@ public abstract class AbstractIDAssert<S extends AbstractIDAssert<S, A>, A exten
 	 *             the given one.
 	 */
 	public S hasClassifier(String classifier) {
-
-		return isNotNull().has(FeaturesConditions.IDConditions.classifier(classifier));
-
+		isNotNull();
+		String actualValue = actual.getClassifier() == null ? null
+			: actual.getClassifier()
+				.orElse(null);
+		if (!Objects.equals(actualValue, classifier)) {
+			throw failureWithActualExpected(actualValue, classifier,
+				"%nExpecting%n  <%s>%nto have classifier:%n  <%s>%nbut was:%n  <%s>", actual, classifier, actualValue);
+		}
+		return myself;
 	}
 
 	/**
@@ -75,7 +89,13 @@ public abstract class AbstractIDAssert<S extends AbstractIDAssert<S, A>, A exten
 	 *             given one.
 	 */
 	public S hasGroupId(String groupId) {
-		return isNotNull().has(FeaturesConditions.IDConditions.groupId(groupId));
+		isNotNull();
+		if (!Objects.equals(actual.getGroupId(), groupId)) {
+			throw failureWithActualExpected(actual.getGroupId(), groupId,
+				"%nExpecting%n  <%s>%nto have groupId:%n  <%s>%nbut was:%n  <%s>", actual, groupId,
+				actual.getGroupId());
+		}
+		return myself;
 	}
 
 	/**
@@ -87,7 +107,15 @@ public abstract class AbstractIDAssert<S extends AbstractIDAssert<S, A>, A exten
 	 *             given one.
 	 */
 	public S hasType(String type) {
-		return isNotNull().has(FeaturesConditions.IDConditions.type(type));
+		isNotNull();
+		String actualValue = actual.getType() == null ? null
+			: actual.getType()
+				.orElse(null);
+		if (!Objects.equals(actualValue, type)) {
+			throw failureWithActualExpected(actualValue, type,
+				"%nExpecting%n  <%s>%nto have type:%n  <%s>%nbut was:%n  <%s>", actual, type, actualValue);
+		}
+		return myself;
 	}
 
 	/**
@@ -99,7 +127,13 @@ public abstract class AbstractIDAssert<S extends AbstractIDAssert<S, A>, A exten
 	 *             given one.
 	 */
 	public S hasVersion(String version) {
-		return isNotNull().has(FeaturesConditions.IDConditions.version(version));
+		isNotNull();
+		if (!Objects.equals(actual.getVersion(), version)) {
+			throw failureWithActualExpected(actual.getVersion(), version,
+				"%nExpecting%n  <%s>%nto have version:%n  <%s>%nbut was:%n  <%s>", actual, version,
+				actual.getVersion());
+		}
+		return myself;
 	}
 
 }

@@ -58,8 +58,8 @@ public class SoftAssertions extends org.assertj.core.api.SoftAssertions {
 	 */
 	@org.assertj.core.util.CheckReturnValue
 	public org.osgi.test.assertj.feature.FeatureBundleAssert assertThat(org.osgi.service.feature.FeatureBundle actual) {
-		return proxy(org.osgi.test.assertj.feature.FeatureBundleAssert.class, org.osgi.service.feature.FeatureBundle.class,
-			actual);
+		return proxy(org.osgi.test.assertj.feature.FeatureBundleAssert.class,
+			org.osgi.service.feature.FeatureBundle.class, actual);
 	}
 
 	/**

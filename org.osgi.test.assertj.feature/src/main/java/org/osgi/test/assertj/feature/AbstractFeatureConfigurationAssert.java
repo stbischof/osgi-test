@@ -19,6 +19,7 @@
 package org.osgi.test.assertj.feature;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -32,7 +33,6 @@ import org.osgi.service.feature.FeatureConfiguration;
  */
 public abstract class AbstractFeatureConfigurationAssert<S extends AbstractFeatureConfigurationAssert<S, A>, A extends FeatureConfiguration>
 	extends AbstractObjectAssert<S, A> {
-	// TODO: is factory
 
 	/**
 	 * Creates a new <code>{@link AbstractFeatureConfigurationAssert}</code> to
@@ -55,7 +55,16 @@ public abstract class AbstractFeatureConfigurationAssert<S extends AbstractFeatu
 	 *             is not equal to the given one.
 	 */
 	public S hasFactoryPid(String factoryPid) {
-		return isNotNull().has(FeaturesConditions.FeatureConfigurationConditions.factoryPid(factoryPid));
+		isNotNull();
+		String actualValue = actual.getFactoryPid() == null ? null
+			: actual.getFactoryPid()
+				.orElse(null);
+		if (!Objects.equals(actualValue, factoryPid)) {
+			throw failureWithActualExpected(actualValue, factoryPid,
+				"%nExpecting%n  <%s>%nto have factoryPid:%n  <%s>%nbut was:%n  <%s>", actual, factoryPid,
+				actualValue);
+		}
+		return myself;
 	}
 
 	/**
@@ -66,7 +75,11 @@ public abstract class AbstractFeatureConfigurationAssert<S extends AbstractFeatu
 	 *             factoryConfiguration.
 	 */
 	public S isFactoryConfiguration() {
-		return isNotNull().is(FeaturesConditions.FeatureConfigurationConditions.factoryConfiguration());
+		isNotNull();
+		if (actual.getFactoryPid() == null || !actual.getFactoryPid().isPresent()) {
+			throw failure("%nExpecting%n  <%s>%nto be a factory configuration but factoryPid was empty", actual);
+		}
+		return myself;
 	}
 
 	/**
@@ -80,7 +93,12 @@ public abstract class AbstractFeatureConfigurationAssert<S extends AbstractFeatu
 	 *             equal to the given one.
 	 */
 	public S hasPid(String pid) {
-		return isNotNull().has(FeaturesConditions.FeatureConfigurationConditions.pid(pid));
+		isNotNull();
+		if (!Objects.equals(actual.getPid(), pid)) {
+			throw failureWithActualExpected(actual.getPid(), pid,
+				"%nExpecting%n  <%s>%nto have pid:%n  <%s>%nbut was:%n  <%s>", actual, pid, actual.getPid());
+		}
+		return myself;
 	}
 
 	@SuppressWarnings("rawtypes")

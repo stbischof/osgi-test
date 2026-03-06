@@ -19,6 +19,7 @@
 package org.osgi.test.assertj.feature;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -63,11 +64,22 @@ public abstract class AbstractFeatureExtensionAssert<S extends AbstractFeatureEx
 	 *             equal to the given one.
 	 */
 	public S hasJSON(String jSON) {
-		return has(FeaturesConditions.FeatureExtensionConditions.json(jSON));
+		isNotNull();
+		if (!Objects.equals(actual.getJSON(), jSON)) {
+			throw failureWithActualExpected(actual.getJSON(), jSON,
+				"%nExpecting%n  <%s>%nto have JSON:%n  <%s>%nbut was:%n  <%s>", actual, jSON, actual.getJSON());
+		}
+		return myself;
 	}
 
-	public S hasJSONMatching(String patten) {
-		return has(FeaturesConditions.FeatureExtensionConditions.jsonMatches(patten));
+	public S hasJSONMatching(String pattern) {
+		isNotNull();
+		String actualValue = actual.getJSON();
+		if (actualValue == null || !actualValue.matches(pattern)) {
+			throw failure("%nExpecting%n  <%s>%nto have JSON matching:%n  <%s>%nbut was:%n  <%s>", actual, pattern,
+				actualValue);
+		}
+		return myself;
 	}
 
 	/**
@@ -81,19 +93,24 @@ public abstract class AbstractFeatureExtensionAssert<S extends AbstractFeatureEx
 	 *             equal to the given one.
 	 */
 	public S hasKind(FeatureExtension.Kind kind) {
-		return has(FeaturesConditions.FeatureExtensionConditions.kind(kind));
+		isNotNull();
+		if (!Objects.equals(actual.getKind(), kind)) {
+			throw failureWithActualExpected(actual.getKind(), kind,
+				"%nExpecting%n  <%s>%nto have kind:%n  <%s>%nbut was:%n  <%s>", actual, kind, actual.getKind());
+		}
+		return myself;
 	}
 
 	public S hasKindMandantory() {
-		return has(FeaturesConditions.FeatureExtensionConditions.kindMandantory());
+		return hasKind(FeatureExtension.Kind.MANDATORY);
 	}
 
 	public S hasKindOptional() {
-		return has(FeaturesConditions.FeatureExtensionConditions.kindOptional());
+		return hasKind(FeatureExtension.Kind.OPTIONAL);
 	}
 
 	public S hasKindTransient() {
-		return has(FeaturesConditions.FeatureExtensionConditions.kindTransient());
+		return hasKind(FeatureExtension.Kind.TRANSIENT);
 	}
 
 	/**
@@ -107,7 +124,12 @@ public abstract class AbstractFeatureExtensionAssert<S extends AbstractFeatureEx
 	 *             equal to the given one.
 	 */
 	public S hasName(String name) {
-		return has(FeaturesConditions.FeatureExtensionConditions.name(name));
+		isNotNull();
+		if (!Objects.equals(actual.getName(), name)) {
+			throw failureWithActualExpected(actual.getName(), name,
+				"%nExpecting%n  <%s>%nto have name:%n  <%s>%nbut was:%n  <%s>", actual, name, actual.getName());
+		}
+		return myself;
 	}
 
 	/**
@@ -121,19 +143,24 @@ public abstract class AbstractFeatureExtensionAssert<S extends AbstractFeatureEx
 	 *             equal to the given one.
 	 */
 	public S hasType(FeatureExtension.Type type) {
-		return has(FeaturesConditions.FeatureExtensionConditions.type(type));
+		isNotNull();
+		if (!Objects.equals(actual.getType(), type)) {
+			throw failureWithActualExpected(actual.getType(), type,
+				"%nExpecting%n  <%s>%nto have type:%n  <%s>%nbut was:%n  <%s>", actual, type, actual.getType());
+		}
+		return myself;
 	}
 
 	public S hasTypeArtifacts() {
-		return has(FeaturesConditions.FeatureExtensionConditions.typeArtifacts());
+		return hasType(FeatureExtension.Type.ARTIFACTS);
 	}
 
 	public S hasTypeJson() {
-		return has(FeaturesConditions.FeatureExtensionConditions.typeJson());
+		return hasType(FeatureExtension.Type.JSON);
 	}
 
 	public S hasTypeText() {
-		return has(FeaturesConditions.FeatureExtensionConditions.typeText());
+		return hasType(FeatureExtension.Type.TEXT);
 	}
 
 }
