@@ -70,9 +70,8 @@ public abstract class AbstractIDAssert<S extends AbstractIDAssert<S, A>, A exten
 	 */
 	public S hasClassifier(String classifier) {
 		isNotNull();
-		String actualValue = actual.getClassifier() == null ? null
-			: actual.getClassifier()
-				.orElse(null);
+		String actualValue = actual.getClassifier()
+			.orElse(null);
 		if (!Objects.equals(actualValue, classifier)) {
 			throw failureWithActualExpected(actualValue, classifier,
 				"%nExpecting%n  <%s>%nto have classifier:%n  <%s>%nbut was:%n  <%s>", actual, classifier, actualValue);
@@ -108,9 +107,8 @@ public abstract class AbstractIDAssert<S extends AbstractIDAssert<S, A>, A exten
 	 */
 	public S hasType(String type) {
 		isNotNull();
-		String actualValue = actual.getType() == null ? null
-			: actual.getType()
-				.orElse(null);
+		String actualValue = actual.getType()
+			.orElse(null);
 		if (!Objects.equals(actualValue, type)) {
 			throw failureWithActualExpected(actualValue, type,
 				"%nExpecting%n  <%s>%nto have type:%n  <%s>%nbut was:%n  <%s>", actual, type, actualValue);

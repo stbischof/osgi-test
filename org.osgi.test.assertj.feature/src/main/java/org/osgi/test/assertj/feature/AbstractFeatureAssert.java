@@ -130,9 +130,8 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 	 */
 	public S hasDescription(String description) {
 		isNotNull();
-		String actualValue = actual.getDescription() == null ? null
-			: actual.getDescription()
-				.orElse(null);
+		String actualValue = actual.getDescription()
+			.orElse(null);
 		if (!Objects.equals(actualValue, description)) {
 			throw failureWithActualExpected(actualValue, description,
 				"%nExpecting%n  <%s>%nto have description:%n  <%s>%nbut was:%n  <%s>", actual, description,
@@ -143,9 +142,8 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 
 	public S hasDescriptionMatching(String pattern) {
 		isNotNull();
-		String actualValue = actual.getDescription() == null ? null
-			: actual.getDescription()
-				.orElse(null);
+		String actualValue = actual.getDescription()
+			.orElse(null);
 		if (actualValue == null || !actualValue.matches(pattern)) {
 			throw failure("%nExpecting%n  <%s>%nto have description matching:%n  <%s>%nbut was:%n  <%s>", actual,
 				pattern, actualValue);
@@ -155,8 +153,7 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 
 	public S isDescriptionEmpty() {
 		isNotNull();
-		if (actual.getDescription() != null && actual.getDescription()
-			.isPresent()) {
+		if (actual.getDescription().isPresent()) {
 			throw failure("%nExpecting%n  <%s>%nto have empty description%nbut was:%n  <%s>", actual,
 				actual.getDescription()
 					.get());
@@ -175,9 +172,8 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 	 */
 	public S hasLicense(String license) {
 		isNotNull();
-		String actualValue = actual.getLicense() == null ? null
-			: actual.getLicense()
-				.orElse(null);
+		String actualValue = actual.getLicense()
+			.orElse(null);
 		if (!Objects.equals(actualValue, license)) {
 			throw failureWithActualExpected(actualValue, license,
 				"%nExpecting%n  <%s>%nto have license:%n  <%s>%nbut was:%n  <%s>", actual, license, actualValue);
@@ -187,9 +183,8 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 
 	public S hasLicenseMatching(String pattern) {
 		isNotNull();
-		String actualValue = actual.getLicense() == null ? null
-			: actual.getLicense()
-				.orElse(null);
+		String actualValue = actual.getLicense()
+			.orElse(null);
 		if (actualValue == null || !actualValue.matches(pattern)) {
 			throw failure("%nExpecting%n  <%s>%nto have license matching:%n  <%s>%nbut was:%n  <%s>", actual, pattern,
 				actualValue);
@@ -199,8 +194,7 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 
 	public S isLicenseEmpty() {
 		isNotNull();
-		if (actual.getLicense() != null && actual.getLicense()
-			.isPresent()) {
+		if (actual.getLicense().isPresent()) {
 			throw failure("%nExpecting%n  <%s>%nto have empty license%nbut was:%n  <%s>", actual, actual.getLicense()
 				.get());
 		}
@@ -217,9 +211,8 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 	 */
 	public S hasName(String name) {
 		isNotNull();
-		String actualValue = actual.getName() == null ? null
-			: actual.getName()
-				.orElse(null);
+		String actualValue = actual.getName()
+			.orElse(null);
 		if (!Objects.equals(actualValue, name)) {
 			throw failureWithActualExpected(actualValue, name,
 				"%nExpecting%n  <%s>%nto have name:%n  <%s>%nbut was:%n  <%s>", actual, name, actualValue);
@@ -229,9 +222,8 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 
 	public S hasNameMatching(String pattern) {
 		isNotNull();
-		String actualValue = actual.getName() == null ? null
-			: actual.getName()
-				.orElse(null);
+		String actualValue = actual.getName()
+			.orElse(null);
 		if (actualValue == null || !actualValue.matches(pattern)) {
 			throw failure("%nExpecting%n  <%s>%nto have name matching:%n  <%s>%nbut was:%n  <%s>", actual, pattern,
 				actualValue);
@@ -241,8 +233,7 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 
 	public S hasNameEmpty() {
 		isNotNull();
-		if (actual.getName() != null && actual.getName()
-			.isPresent()) {
+		if (actual.getName().isPresent()) {
 			throw failure("%nExpecting%n  <%s>%nto have empty name%nbut was:%n  <%s>", actual, actual.getName()
 				.get());
 		}
@@ -259,9 +250,8 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 	 */
 	public S hasVendor(String vendor) {
 		isNotNull();
-		String actualValue = actual.getVendor() == null ? null
-			: actual.getVendor()
-				.orElse(null);
+		String actualValue = actual.getVendor()
+			.orElse(null);
 		if (!Objects.equals(actualValue, vendor)) {
 			throw failureWithActualExpected(actualValue, vendor,
 				"%nExpecting%n  <%s>%nto have vendor:%n  <%s>%nbut was:%n  <%s>", actual, vendor, actualValue);
@@ -271,9 +261,8 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 
 	public S hasVendorMatching(String pattern) {
 		isNotNull();
-		String actualValue = actual.getVendor() == null ? null
-			: actual.getVendor()
-				.orElse(null);
+		String actualValue = actual.getVendor()
+			.orElse(null);
 		if (actualValue == null || !actualValue.matches(pattern)) {
 			throw failure("%nExpecting%n  <%s>%nto have vendor matching:%n  <%s>%nbut was:%n  <%s>", actual, pattern,
 				actualValue);
@@ -283,8 +272,7 @@ public abstract class AbstractFeatureAssert<S extends AbstractFeatureAssert<S, A
 
 	public S isVendorEmpty() {
 		isNotNull();
-		if (actual.getVendor() != null && actual.getVendor()
-			.isPresent()) {
+		if (actual.getVendor().isPresent()) {
 			throw failure("%nExpecting%n  <%s>%nto have empty vendor%nbut was:%n  <%s>", actual, actual.getVendor()
 				.get());
 		}

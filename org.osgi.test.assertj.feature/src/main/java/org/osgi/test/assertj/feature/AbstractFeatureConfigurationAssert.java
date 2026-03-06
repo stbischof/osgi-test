@@ -56,9 +56,8 @@ public abstract class AbstractFeatureConfigurationAssert<S extends AbstractFeatu
 	 */
 	public S hasFactoryPid(String factoryPid) {
 		isNotNull();
-		String actualValue = actual.getFactoryPid() == null ? null
-			: actual.getFactoryPid()
-				.orElse(null);
+		String actualValue = actual.getFactoryPid()
+			.orElse(null);
 		if (!Objects.equals(actualValue, factoryPid)) {
 			throw failureWithActualExpected(actualValue, factoryPid,
 				"%nExpecting%n  <%s>%nto have factoryPid:%n  <%s>%nbut was:%n  <%s>", actual, factoryPid,
@@ -76,7 +75,7 @@ public abstract class AbstractFeatureConfigurationAssert<S extends AbstractFeatu
 	 */
 	public S isFactoryConfiguration() {
 		isNotNull();
-		if (actual.getFactoryPid() == null || !actual.getFactoryPid().isPresent()) {
+		if (!actual.getFactoryPid().isPresent()) {
 			throw failure("%nExpecting%n  <%s>%nto be a factory configuration but factoryPid was empty", actual);
 		}
 		return myself;
