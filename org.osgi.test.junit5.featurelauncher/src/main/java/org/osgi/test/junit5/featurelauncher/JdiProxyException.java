@@ -61,7 +61,7 @@ class JdiProxyException extends RuntimeException {
 	 * @param actualValue       the actual parameter value
 	 * @return a JdiProxyException with full debug context
 	 */
-	public static JdiProxyException forParameter(String remoteServiceType, Method method, int parameterIndex,
+	static JdiProxyException forParameter(String remoteServiceType, Method method, int parameterIndex,
 			Object actualValue) {
 
 		Class<?> declaredType = method.getParameterTypes()[parameterIndex];
@@ -93,7 +93,7 @@ class JdiProxyException extends RuntimeException {
 	 *                          null)
 	 * @return a JdiProxyException with full debug context
 	 */
-	public static JdiProxyException forReturnType(String remoteServiceType, Method method, Object jdiValue) {
+	static JdiProxyException forReturnType(String remoteServiceType, Method method, Object jdiValue) {
 
 		Class<?> declaredReturn = method.getReturnType();
 		Type genericReturn = method.getGenericReturnType();

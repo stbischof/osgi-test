@@ -57,7 +57,7 @@ class JdiDtoReader {
 	 * reflection to discover fields and their types.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends DTO> T readDto(Class<T> dtoClass, ObjectReference ref, ThreadReference thread) {
+	static <T extends DTO> T readDto(Class<T> dtoClass, ObjectReference ref, ThreadReference thread) {
 		try {
 			T dto = dtoClass.getConstructor().newInstance();
 			for (java.lang.reflect.Field f : dtoClass.getFields()) {
@@ -107,7 +107,7 @@ class JdiDtoReader {
 		}
 	}
 
-	public static Integer readBoxedInt(ObjectReference obj, String fieldName) {
+	private static Integer readBoxedInt(ObjectReference obj, String fieldName) {
 		Field field = obj.referenceType().fieldByName(fieldName);
 		if (field == null) {
 			return null;
@@ -181,7 +181,7 @@ class JdiDtoReader {
 		return result;
 	}
 
-	public static int readInt(ObjectReference obj, String fieldName) {
+	private static int readInt(ObjectReference obj, String fieldName) {
 		Field field = obj.referenceType().fieldByName(fieldName);
 		if (field == null) {
 			throw new IllegalArgumentException("No field '" + fieldName + "' on " + obj.referenceType().name());
@@ -193,7 +193,7 @@ class JdiDtoReader {
 		throw new IllegalStateException("Field '" + fieldName + "' is not an int: " + value);
 	}
 
-	public static long readLong(ObjectReference obj, String fieldName) {
+	private static long readLong(ObjectReference obj, String fieldName) {
 		Field field = obj.referenceType().fieldByName(fieldName);
 		if (field == null) {
 			throw new IllegalArgumentException("No field '" + fieldName + "' on " + obj.referenceType().name());
@@ -205,7 +205,7 @@ class JdiDtoReader {
 		throw new IllegalStateException("Field '" + fieldName + "' is not a long: " + value);
 	}
 
-	public static boolean readBoolean(ObjectReference obj, String fieldName) {
+	private static boolean readBoolean(ObjectReference obj, String fieldName) {
 		Field field = obj.referenceType().fieldByName(fieldName);
 		if (field == null) {
 			throw new IllegalArgumentException("No field '" + fieldName + "' on " + obj.referenceType().name());
@@ -217,7 +217,7 @@ class JdiDtoReader {
 		throw new IllegalStateException("Field '" + fieldName + "' is not a boolean: " + value);
 	}
 
-	public static String readString(ObjectReference obj, String fieldName) {
+	private static String readString(ObjectReference obj, String fieldName) {
 		Field field = obj.referenceType().fieldByName(fieldName);
 		if (field == null) {
 			throw new IllegalArgumentException("No field '" + fieldName + "' on " + obj.referenceType().name());
@@ -232,7 +232,7 @@ class JdiDtoReader {
 		throw new IllegalStateException("Field '" + fieldName + "' is not a String: " + value);
 	}
 
-	public static long[] readLongArray(ObjectReference obj, String fieldName) {
+	private static long[] readLongArray(ObjectReference obj, String fieldName) {
 		Field field = obj.referenceType().fieldByName(fieldName);
 		if (field == null) {
 			throw new IllegalArgumentException("No field '" + fieldName + "' on " + obj.referenceType().name());
@@ -254,7 +254,7 @@ class JdiDtoReader {
 		throw new IllegalStateException("Field '" + fieldName + "' is not a long[]: " + value);
 	}
 
-	public static List<ObjectReference> readList(ObjectReference obj, String fieldName, ThreadReference thread) {
+	private static List<ObjectReference> readList(ObjectReference obj, String fieldName, ThreadReference thread) {
 		Field field = obj.referenceType().fieldByName(fieldName);
 		if (field == null) {
 			throw new IllegalArgumentException("No field '" + fieldName + "' on " + obj.referenceType().name());
@@ -287,7 +287,7 @@ class JdiDtoReader {
 		return Collections.emptyList();
 	}
 
-	public static Map<String, Object> readStringObjectMap(ObjectReference obj, String fieldName,
+	private static Map<String, Object> readStringObjectMap(ObjectReference obj, String fieldName,
 			ThreadReference thread) {
 		Field field = obj.referenceType().fieldByName(fieldName);
 		if (field == null) {
@@ -342,7 +342,7 @@ class JdiDtoReader {
 		return result;
 	}
 
-	public static Object convertValue(Value value) {
+	private static Object convertValue(Value value) {
 		if (value == null) {
 			return null;
 		}
@@ -424,7 +424,7 @@ class JdiDtoReader {
 		return value.toString();
 	}
 
-	public static Method findMethod(ReferenceType type, String name, int paramCount) {
+	static Method findMethod(ReferenceType type, String name, int paramCount) {
 		for (Method m : type.allMethods()) {
 			if (m.name().equals(name) && m.argumentTypeNames().size() == paramCount) {
 				return m;
@@ -438,7 +438,7 @@ class JdiDtoReader {
 	 * Finds a method by name and exact argument type names. Used to disambiguate
 	 * overloads like {@code getBundle(long)} vs {@code getBundle(String)}.
 	 */
-	public static Method findMethod(ReferenceType type, String name, List<String> argTypes) {
+	static Method findMethod(ReferenceType type, String name, List<String> argTypes) {
 		for (Method m : type.allMethods()) {
 			if (m.name().equals(name) && m.argumentTypeNames().equals(argTypes)) {
 				return m;
@@ -447,7 +447,7 @@ class JdiDtoReader {
 		throw new IllegalArgumentException("No method '" + name + "' with args " + argTypes + " on " + type.name());
 	}
 
-	public static String[] readStringArray(ObjectReference obj, String fieldName) {
+	private static String[] readStringArray(ObjectReference obj, String fieldName) {
 		Field field = obj.referenceType().fieldByName(fieldName);
 		if (field == null) {
 			throw new IllegalArgumentException("No field '" + fieldName + "' on " + obj.referenceType().name());

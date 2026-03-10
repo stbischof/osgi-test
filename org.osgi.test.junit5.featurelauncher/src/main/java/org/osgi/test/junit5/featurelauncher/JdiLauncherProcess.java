@@ -53,7 +53,7 @@ class JdiLauncherProcess {
 
 	private Process process;
 
-	public JdiLauncherProcess(String launcherJar, String featureFile, String[] classpath, String[] artifactRepositories,
+	JdiLauncherProcess(String launcherJar, String featureFile, String[] classpath, String[] artifactRepositories,
 			boolean useDefaultRepos, String[] decorators, String[] extensionHandlers, String[] variableOverrides,
 			String[] configuration, String[] frameworkProperties, int debugPort, String workingDirectory,
 			String[] jvmArgs) {
@@ -72,7 +72,7 @@ class JdiLauncherProcess {
 		this.jvmArgs = jvmArgs;
 	}
 
-	public Process start() throws IOException {
+	Process start() throws IOException {
 		Path java = Paths.get(System.getProperty("java.home"), "bin", "java");
 
 		List<String> command = new ArrayList<>();
@@ -138,7 +138,7 @@ class JdiLauncherProcess {
 		return process;
 	}
 
-	public void stop() {
+	void stop() {
 		if (process == null || !process.isAlive()) {
 			return;
 		}
@@ -161,7 +161,7 @@ class JdiLauncherProcess {
 				process.isAlive() ? "still running" : process.exitValue());
 	}
 
-	public Process getProcess() {
+	Process getProcess() {
 		return process;
 	}
 

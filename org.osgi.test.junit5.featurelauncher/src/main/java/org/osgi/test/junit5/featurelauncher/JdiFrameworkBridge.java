@@ -81,7 +81,7 @@ class JdiFrameworkBridge {
 	 */
 	private final Map<DTO, ObjectReference> dtoReferenceMap = new IdentityHashMap<>();
 
-	public JdiFrameworkBridge(VirtualMachine vm) {
+	JdiFrameworkBridge(VirtualMachine vm) {
 		this.vm = vm;
 	}
 
@@ -97,7 +97,7 @@ class JdiFrameworkBridge {
 	 * @param bundleId the bundle ID
 	 * @return a proxy implementing the Bundle interface
 	 */
-	public Bundle resolveBundleProxy(long bundleId) {
+	Bundle resolveBundleProxy(long bundleId) {
 		vm.suspend();
 		try {
 			ThreadReference thread = acquireEventSuspendedThread();
@@ -115,7 +115,7 @@ class JdiFrameworkBridge {
 	 *
 	 * @return a proxy implementing the BundleContext interface
 	 */
-	public BundleContext resolveBundleContextProxy() {
+	BundleContext resolveBundleContextProxy() {
 		vm.suspend();
 		try {
 			ThreadReference thread = acquireEventSuspendedThread();
@@ -142,7 +142,7 @@ class JdiFrameworkBridge {
 	 * @param symbolicName the bundle symbolic name
 	 * @return a proxy implementing the Bundle interface
 	 */
-	public Bundle resolveBundleProxy(String symbolicName) {
+	Bundle resolveBundleProxy(String symbolicName) {
 		vm.suspend();
 		try {
 			ThreadReference thread = acquireEventSuspendedThread();
@@ -194,7 +194,7 @@ class JdiFrameworkBridge {
 	 * @return the ObjectReference to the Framework instance (VM is suspended on
 	 *         return)
 	 */
-	public ObjectReference waitForFrameworkActive(long timeoutMs, long pollIntervalMs) {
+	ObjectReference waitForFrameworkActive(long timeoutMs, long pollIntervalMs) {
 		LOG.info("Waiting for OSGi framework to become ACTIVE (timeout: {}ms, poll: {}ms)", timeoutMs, pollIntervalMs);
 
 		// Resume the VM — it was started with suspend=y
@@ -292,7 +292,7 @@ class JdiFrameworkBridge {
 	 * @param framework the ObjectReference to the Framework instance
 	 * @return a FrameworkDTO with bundles, services, and properties
 	 */
-	public FrameworkDTO extractFrameworkDTO(ObjectReference framework) {
+	private FrameworkDTO extractFrameworkDTO(ObjectReference framework) {
 		try {
 			ThreadReference thread = acquireEventSuspendedThread();
 			LOG.debug("Acquired event-suspended thread: {}", thread.name());
@@ -324,7 +324,7 @@ class JdiFrameworkBridge {
 	 * @param framework the ObjectReference to the Framework instance
 	 * @return a FrameworkStartLevelDTO
 	 */
-	public FrameworkStartLevelDTO extractFrameworkStartLevelDTO(ObjectReference framework) {
+	private FrameworkStartLevelDTO extractFrameworkStartLevelDTO(ObjectReference framework) {
 		try {
 			ThreadReference thread = acquireEventSuspendedThread();
 			LOG.debug("Acquired event-suspended thread: {}", thread.name());
@@ -346,7 +346,7 @@ class JdiFrameworkBridge {
 	/**
 	 * Takes a FrameworkDTO from a running VM (suspend, extract, resume).
 	 */
-	public FrameworkDTO takeFrameworkDTOFromRunningVm() {
+	FrameworkDTO takeFrameworkDTOFromRunningVm() {
 		vm.suspend();
 		try {
 			ObjectReference framework = findFrameworkInstance();
@@ -362,7 +362,7 @@ class JdiFrameworkBridge {
 	/**
 	 * Takes a FrameworkStartLevelDTO from a running VM (suspend, extract, resume).
 	 */
-	public FrameworkStartLevelDTO takeFrameworkStartLevelDTOFromRunningVm() {
+	FrameworkStartLevelDTO takeFrameworkStartLevelDTOFromRunningVm() {
 		vm.suspend();
 		try {
 			ObjectReference framework = findFrameworkInstance();

@@ -41,7 +41,7 @@ class JdiConnector {
 
 	private VirtualMachine vm;
 
-	public VirtualMachine attach(int port, int timeoutMs, int maxRetries) throws IOException {
+	VirtualMachine attach(int port, int timeoutMs, int maxRetries) throws IOException {
 		AttachingConnector socketConnector = findSocketConnector();
 
 		Map<String, Connector.Argument> args = socketConnector.defaultArguments();
@@ -75,13 +75,13 @@ class JdiConnector {
 				lastException);
 	}
 
-	public void resume() {
+	void resume() {
 		if (vm != null) {
 			vm.resume();
 		}
 	}
 
-	public void dispose() {
+	void dispose() {
 		if (vm != null) {
 			try {
 				vm.dispose();
@@ -93,7 +93,7 @@ class JdiConnector {
 		}
 	}
 
-	public VirtualMachine getVm() {
+	VirtualMachine getVm() {
 		return vm;
 	}
 
