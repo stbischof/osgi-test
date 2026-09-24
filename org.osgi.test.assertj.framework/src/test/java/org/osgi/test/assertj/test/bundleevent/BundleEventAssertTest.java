@@ -122,6 +122,22 @@ class BundleEventAssertTest
 			.hasMessageMatching("(?s).*not.* of type.*" + type + ".*" + typeToString(type) + ".*but it was.*");
 	}
 
+	@ParameterizedTest
+	@TypeSource
+	public void isOfTypeMaskedBy_acceptsFullKnownMask(int type) {
+		setActual(new BundleEvent(type, bundle, origin));
+
+		// The mask of all known types is a valid mask: it must not be rejected
+		// as illegal, and the result depends on whether the actual type is known
+		if ((type & UNKNOWN_MASK) != 0) {
+			assertFailing(aut::isOfTypeMaskedBy, KNOWN_MASK);
+			assertPassing(aut::isNotOfTypeMaskedBy, KNOWN_MASK);
+		} else {
+			assertPassing(aut::isOfTypeMaskedBy, KNOWN_MASK);
+			assertFailing(aut::isNotOfTypeMaskedBy, KNOWN_MASK);
+		}
+	}
+
 	@Test
 	public void isOfTypeMaskedBy() {
 		setActual(new BundleEvent(LAZY_ACTIVATION, bundle, origin));

@@ -65,7 +65,7 @@ public abstract class AbstractBitmappedTypeEventAssert<SELF extends AbstractBitm
 
 	public SELF isOfTypeMaskedBy(int mask) {
 		isNotNull();
-		if (mask <= 0 || mask >= bitmap.getKnownMask()) {
+		if (mask == 0 || (mask & ~bitmap.getKnownMask()) != 0) {
 			throw new IllegalArgumentException("Mask testing for an illegal type: " + mask);
 		}
 		if ((actualType() & mask) == 0) {
@@ -78,7 +78,7 @@ public abstract class AbstractBitmappedTypeEventAssert<SELF extends AbstractBitm
 
 	public SELF isNotOfTypeMaskedBy(int mask) {
 		isNotNull();
-		if (mask <= 0 || mask >= bitmap.getKnownMask()) {
+		if (mask == 0 || (mask & ~bitmap.getKnownMask()) != 0) {
 			throw new IllegalArgumentException("Mask testing for an illegal type: " + mask);
 		}
 		if ((actualType() & mask) != 0) {
