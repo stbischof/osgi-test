@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.Hashtable;
@@ -148,6 +149,25 @@ public class AwaitCalmTest {
 			assertThat(events.size()).isEqualTo(40);
 			assertThat(events).isSorted();
 			assertThat(events).allMatch(e -> e.event() instanceof BundleEvent);
+		}
+
+		@Test
+		@DisplayName("Event times are relative to the start of the wait")
+		public void testEventTimesRelativeToWaitStart() throws Exception {
+			// Three iterations, four events each, roughly 150ms apart
+			makeNoise(3, 150, bundleNoise(bundle));
+
+			long start = System.nanoTime();
+			List<TimedEvent<EventObject>> events = ac.waitForQuiet(ofMillis(500), ofSeconds(3));
+			Duration elapsed = Duration.ofNanos(System.nanoTime() - start);
+
+			assertThat(events.size()).isEqualTo(12);
+			assertThat(events).isSorted();
+			// No event can have happened after the wait returned
+			assertThat(events).allSatisfy(e -> assertThat(e.time()).isBetween(Duration.ZERO, elapsed));
+			// The last iteration ran no earlier than 3 x 150ms after the start
+			assertThat(events.get(events.size() - 1)
+				.time()).isGreaterThanOrEqualTo(ofMillis(300));
 		}
 
 		@Test

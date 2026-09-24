@@ -34,20 +34,21 @@ import org.osgi.test.common.await.FrameworkWatcher;
 import org.osgi.test.common.context.ContextHelper;
 
 /**
- * A JUnit 4 Rule to depend on OSGi services.
+ * A JUnit 4 Rule that injects an {@link AwaitCalm} to wait for the framework
+ * to become quiet.
  * <p>
  * Example: <br>
  *
  * <pre>
  * &#64;Rule
- * public ServiceRule sr = new ServiceRule();
+ * public AwaitCalmRule acr = new AwaitCalmRule();
  *
- * &#64;InjectService
- * Foo foo;
+ * &#64;InjectAwaitCalm
+ * AwaitCalm await;
  *
  * &#64;Test
- * public void aTest() {
- * 	// use foo
+ * public void aTest() throws Exception {
+ * 	await.waitForQuiet(Duration.ofMillis(200), Duration.ofSeconds(2));
  * }
  * </pre>
  */

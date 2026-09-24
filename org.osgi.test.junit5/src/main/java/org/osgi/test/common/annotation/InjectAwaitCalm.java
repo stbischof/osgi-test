@@ -37,10 +37,8 @@ import org.osgi.test.junit5.await.AwaitCalmExtension;
  * Example:
  *
  * <pre>
+ * &#64;ExtendWith(AwaitCalmExtension.class)
  * class MyTests {
- * 	// For JUnit4
- * 	&#64;Rule
- * 	ServiceRule sr = new ServiceRule();
  *
  * 	&#64;InjectAwaitCalm
  * 	AwaitCalm await;

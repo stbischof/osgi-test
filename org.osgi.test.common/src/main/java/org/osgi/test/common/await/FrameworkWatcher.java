@@ -47,7 +47,10 @@ public class FrameworkWatcher implements AwaitCalm {
 		private final ReentrantLock				lock	= new ReentrantLock();
 		private final Condition					quiet	= lock.newCondition();
 		private List<TimedEvent<EventObject>>	events	= new ArrayList<>();
-		private Long							lastEventNanos;
+		// Set before the listener is registered so that an event arriving
+		// before the wait starts is measured from the same origin
+		private final long						startNanos	= System.nanoTime();
+		private long							lastEventNanos	= startNanos;
 
 		@Override
 		public void bundleChanged(BundleEvent event) {
@@ -63,11 +66,11 @@ public class FrameworkWatcher implements AwaitCalm {
 			lock.lock();
 			try {
 				long eventTime = System.nanoTime();
-				long previousEventTime = lastEventNanos == null ? eventTime : lastEventNanos;
-				Duration sinceStart = events.stream()
-					.map(TimedEvent::time)
-					.reduce(Duration.ZERO, Duration::plus);
-				events.add(new TimedEvent<>(sinceStart.plusNanos(eventTime - previousEventTime), event));
+				// The time of the previous event, or zero if this is the first one
+				Duration previousTime = events.isEmpty() ? Duration.ZERO
+					: events.get(events.size() - 1)
+						.time();
+				events.add(new TimedEvent<>(previousTime.plusNanos(eventTime - lastEventNanos), event));
 				lastEventNanos = eventTime;
 				quiet.signalAll();
 			} finally {
@@ -79,14 +82,9 @@ public class FrameworkWatcher implements AwaitCalm {
 			throws InterruptedException, AwaitCalmTimeoutException {
 			final long quietNanos = quietPeriod.toNanos();
 			final long deadlineNanos = timeout.toNanos();
-			final long start = System.nanoTime();
+			final long start = startNanos;
 			long remainingQuiet = quietNanos;
 			lock.lock();
-			if (lastEventNanos == null) {
-				// If no events have occurred yet then we initialize
-				// lastEventNanos to when we started
-				lastEventNanos = start;
-			}
 			try {
 				for (long now = System.nanoTime(); (now - start) <= deadlineNanos; now = System.nanoTime()) {
 					remainingQuiet = quietNanos - (now - lastEventNanos);
