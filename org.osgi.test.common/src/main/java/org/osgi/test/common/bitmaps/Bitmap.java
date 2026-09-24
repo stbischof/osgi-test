@@ -74,7 +74,7 @@ public class Bitmap {
 	 *         mask.
 	 */
 	public int getUnknownMask() {
-		return KNOWN_MASK;
+		return UNKNOWN_MASK;
 	}
 
 	/**
