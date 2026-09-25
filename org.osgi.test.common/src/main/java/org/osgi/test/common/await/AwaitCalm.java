@@ -89,7 +89,7 @@ public interface AwaitCalm {
 		@Override
 		public int compareTo(TimedEvent<?> o) {
 			int timeCompare = time.compareTo(o.time);
-			return timeCompare != 0 ? timeCompare : hashCode() - o.hashCode();
+			return timeCompare != 0 ? timeCompare : Integer.compare(event.hashCode(), o.event.hashCode());
 		}
 
 		@Override
@@ -119,7 +119,7 @@ public interface AwaitCalm {
 	 *
 	 * @param quietPeriod The required time during which no events must occur
 	 * @param timeout The maximum time to wait for quiet
-	 * @return The number of events received during the wait
+	 * @return The events received during the wait, in the order they occurred
 	 * @throws InterruptedException if the waiting thread is interrupted
 	 * @throws AwaitCalmTimeoutException if {@code timeout} expires before the
 	 *             quiet period is reached
@@ -133,7 +133,7 @@ public interface AwaitCalm {
 	 *
 	 * @param quietPeriod The required time during which no events must occur
 	 * @param timeout The maximum time to wait for quiet
-	 * @return The number of events received during the wait
+	 * @return The events received during the wait, in the order they occurred
 	 * @throws InterruptedException if the waiting thread is interrupted
 	 * @throws AwaitCalmTimeoutException if {@code timeout} expires before the
 	 *             quiet period is reached
@@ -147,7 +147,7 @@ public interface AwaitCalm {
 	 *
 	 * @param quietPeriod The required time during which no events must occur
 	 * @param timeout The maximum time to wait for quiet
-	 * @return The number of events received during the wait
+	 * @return The events received during the wait, in the order they occurred
 	 * @throws InterruptedException if the waiting thread is interrupted
 	 * @throws AwaitCalmTimeoutException if {@code timeout} expires before the
 	 *             quiet period is reached
@@ -163,7 +163,7 @@ public interface AwaitCalm {
 	 * @param quietPeriod The required time during which no events must occur
 	 * @param timeout The maximum time to wait for quiet
 	 * @param filter The filter to apply when listening for service events
-	 * @return The number of events received during the wait
+	 * @return The events received during the wait, in the order they occurred
 	 * @throws InterruptedException if the waiting thread is interrupted
 	 * @throws AwaitCalmTimeoutException if {@code timeout} expires before the
 	 *             quiet period is reached

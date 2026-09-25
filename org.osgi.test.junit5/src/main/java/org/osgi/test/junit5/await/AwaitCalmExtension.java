@@ -28,20 +28,21 @@ import org.osgi.test.junit5.context.BundleContextExtension;
 import org.osgi.test.junit5.inject.InjectingExtension;
 
 /**
- * A JUnit 5 Extension to depend on OSGi services.
+ * A JUnit 5 Extension that injects an {@link AwaitCalm} to wait for the
+ * framework to become quiet.
  * <p>
  * Example: <br>
  *
  * <pre>
- * &#64;ExtendWith(ServiceExtension.class)
+ * &#64;ExtendWith(AwaitCalmExtension.class)
  * class MyTests {
  *
- * 	&#64;InjectService
- * 	Foo foo;
+ * 	&#64;InjectAwaitCalm
+ * 	AwaitCalm await;
  *
  * 	&#64;Test
- * 	public void test() {
- * 		// use foo
+ * 	public void test() throws Exception {
+ * 		await.waitForQuiet(Duration.ofMillis(200), Duration.ofSeconds(2));
  * 	}
  * }
  * </pre>
