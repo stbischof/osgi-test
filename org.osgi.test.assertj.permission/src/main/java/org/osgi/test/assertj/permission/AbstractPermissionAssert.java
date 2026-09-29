@@ -87,8 +87,8 @@ public abstract class AbstractPermissionAssert<SELF extends AbstractPermissionAs
 	}
 
 	/**
-	 * Verifies that the permission and the given one are not equal, in
-	 * neither direction.
+	 * Verifies that the permission and the given one are not equal, in either
+	 * direction.
 	 *
 	 * @param other The different permission.
 	 * @return This assertion object.

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -252,6 +252,6 @@ public abstract class AbstractPermissionCollectionAssert<SELF extends AbstractPe
 	}
 
 	private static Set<Permission> elements(PermissionCollection collection) {
-		return new HashSet<>(Collections.list(collection.elements()));
+		return new LinkedHashSet<>(Collections.list(collection.elements()));
 	}
 }
