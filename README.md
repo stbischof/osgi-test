@@ -38,16 +38,16 @@ A set of example projects demonstrating how to set up OSGi testing with Maven, i
 
 ## Building
 
-We use Maven to build and the repo includes `mvnw`.
-You can use your system `mvn` but we require a recent version.
+We use Maven to build and require a recent version.
 
-- `./mvnw clean install` - Assembles and tests the project
+- `mvn clean install` - Assembles and tests the project
 
-[![Build Status](https://github.com/eclipse-osgi-technology/osgi-test/actions/workflows/cibuild.yml/badge.svg)](https://github.com/eclipse-osgi-technology/osgi-test/actions/workflows/cibuild.yml)
+[![Build Status](https://github.com/eclipse-osgi-technology/osgi-test/actions/workflows/build.yml/badge.svg)](https://github.com/eclipse-osgi-technology/osgi-test/actions/workflows/build.yml)
 
 ## Code Quality
 
-We use [CodeQL](https://github.com/eclipse-osgi-technology/osgi-test/blob/main/.github/workflows/codeql-analysis.yml) for continuous security analysis.
+We use [CodeQL](https://github.com/eclipse-osgi-technology/osgi-test/blob/main/.github/workflows/codeql.yml) for continuous security analysis
+and the [OpenSSF Scorecard](https://github.com/eclipse-osgi-technology/osgi-test/blob/main/.github/workflows/scorecard-analysis.yml).
 
 ## Repository
 
