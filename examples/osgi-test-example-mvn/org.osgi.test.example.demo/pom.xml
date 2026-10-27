@@ -12,7 +12,7 @@
 
 	<description>OSGi Testing Example - Demonstrates all Features</description>
 	<name>${project.groupId}:${project.artifactId}</name>
-	<url>https://www.osgi.org</url>
+	<url>https://eclipse-osgi-technology.github.io/osgi-test/</url>
 
 	<dependencies>
 		<dependency>

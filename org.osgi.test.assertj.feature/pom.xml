@@ -31,11 +31,11 @@
 	<artifactId>org.osgi.test.assertj.feature</artifactId>
 	<description>OSGi Testing AssertJ Support for Features</description>
 	<name>${project.groupId}:${project.artifactId}</name>
-	<url>https://www.osgi.org</url>
+	<url>https://eclipse-osgi-technology.github.io/osgi-test/</url>
 	<scm>
-		<url>https://github.com/osgi/osgi-test</url>
-		<connection>scm:git:https://github.com/osgi/osgi-test.git</connection>
-		<developerConnection>scm:git:git@github.com:osgi/osgi-test.git</developerConnection>
+		<url>https://github.com/eclipse-osgi-technology/osgi-test</url>
+		<connection>scm:git:https://github.com/eclipse-osgi-technology/osgi-test.git</connection>
+		<developerConnection>scm:git:git@github.com:eclipse-osgi-technology/osgi-test.git</developerConnection>
 	</scm>
 
 	<dependencies>

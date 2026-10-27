@@ -32,11 +32,11 @@
 	<artifactId>org.osgi.test.example.player.impl</artifactId>
 	<description>OSGi Testing Example Player Implementation</description>
 	<name>${project.groupId}:${project.artifactId}</name>
-	<url>https://www.osgi.org</url>
+	<url>https://eclipse-osgi-technology.github.io/osgi-test/</url>
 	<scm>
-		<url>https://github.com/rotty3000/osgi-test-example-mvn</url>
-		<connection>scm:git:https://github.com/rotty3000/osgi-test-example-mvn.git</connection>
-		<developerConnection>scm:git:git@github.com:rotty3000/osgi-test-example-mvn.git</developerConnection>
+		<url>https://github.com/eclipse-osgi-technology/osgi-test</url>
+		<connection>scm:git:https://github.com/eclipse-osgi-technology/osgi-test.git</connection>
+		<developerConnection>scm:git:git@github.com:eclipse-osgi-technology/osgi-test.git</developerConnection>
 	</scm>
 
 	<dependencies>

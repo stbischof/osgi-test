@@ -51,7 +51,7 @@
 		<module>org.osgi.test.example.demo</module>
 	</modules>
 
-	<url>https://www.osgi.org</url>
+	<url>https://eclipse-osgi-technology.github.io/osgi-test/</url>
 	<organization>
 		<name>OSGi Working Group</name>
 		<url>https://www.osgi.org</url>
@@ -65,18 +65,16 @@
 		</license>
 	</licenses>
 	<scm>
-		<url>https://github.com/osgi/osgi-test</url>
-		<connection>scm:git:https://github.com/osgi/osgi-test.git</connection>
-		<developerConnection>scm:git:git@github.com:osgi/osgi-test.git</developerConnection>
+		<url>https://github.com/eclipse-osgi-technology/osgi-test</url>
+		<connection>scm:git:https://github.com/eclipse-osgi-technology/osgi-test.git</connection>
+		<developerConnection>scm:git:git@github.com:eclipse-osgi-technology/osgi-test.git</developerConnection>
 	</scm>
 	<developers>
 		<developer>
 			<id>bjhargrave</id>
 			<name>BJ Hargrave</name>
-			<email>hargrave@us.ibm.com</email>
+			<email>bj@hargrave.dev</email>
 			<url>https://github.com/bjhargrave</url>
-			<organization>IBM</organization>
-			<organizationUrl>https://developer.ibm.com</organizationUrl>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -100,10 +98,37 @@
 			<email>fr.jkrieg@greekwelfaresa.org.au</email>
 			<timezone>Australia/Adelaide</timezone>
 		</developer>
+		<developer>
+			<id>stbischof</id>
+			<name>Stefan Bischof</name>
+			<email>stbischof@bipolis.org</email>
+			<url>https://github.com/stbischof</url>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>timothyjward</id>
+			<name>Tim Ward</name>
+			<email>timothyjward@apache.org</email>
+			<url>https://github.com/timothyjward</url>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>juergen-albert</id>
+			<name>Jürgen Albert</name>
+			<email>j.albert@data-in-motion.biz</email>
+			<url>https://github.com/juergen-albert</url>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
 	</developers>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/osgi/osgi-test</url>
+		<url>https://github.com/eclipse-osgi-technology/osgi-test/issues</url>
 	</issueManagement>
 
 	<build>
