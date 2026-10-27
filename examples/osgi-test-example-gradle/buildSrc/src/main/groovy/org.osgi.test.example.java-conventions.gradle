@@ -36,7 +36,7 @@ publishing {
 		// Configure pom metadata
 		withType(MavenPublication) { publication ->
 			pom {
-				url.set("https://www.osgi.org")
+				url.set("https://eclipse-osgi-technology.github.io/osgi-test/")
 				organization {
 					name.set("OSGi Working Group")
 					url.set("https://www.osgi.org")
@@ -50,20 +50,39 @@ publishing {
 					}
 				}
 				scm {
-					url.set("https://github.com/osgi/osgi-test")
-					connection.set("scm:git:https://github.com/osgi/osgi-test.git")
-					developerConnection.set("scm:git:git@github.com:osgi/osgi-test.git")
+					url.set("https://github.com/eclipse-osgi-technology/osgi-test")
+					connection.set("scm:git:https://github.com/eclipse-osgi-technology/osgi-test.git")
+					developerConnection.set("scm:git:git@github.com:eclipse-osgi-technology/osgi-test.git")
 				}
 				developers {
 					developer {
 						id.set("bjhargrave")
 						name.set("BJ Hargrave")
-						email.set("hargrave@us.ibm.com")
+						email.set("bj@hargrave.dev")
 						url.set("https://github.com/bjhargrave")
-						organization.set("IBM")
-						organizationUrl.set("https://developer.ibm.com")
 						roles.set(["developer"])
 						timezone.set("America/New_York")
+					}
+					developer {
+						id.set("stbischof")
+						name.set("Stefan Bischof")
+						email.set("stbischof@bipolis.org")
+						url.set("https://github.com/stbischof")
+						roles.set(["developer"])
+					}
+					developer {
+						id.set("timothyjward")
+						name.set("Tim Ward")
+						email.set("timothyjward@apache.org")
+						url.set("https://github.com/timothyjward")
+						roles.set(["developer"])
+					}
+					developer {
+						id.set("juergen-albert")
+						name.set("Jürgen Albert")
+						email.set("j.albert@data-in-motion.biz")
+						url.set("https://github.com/juergen-albert")
+						roles.set(["developer"])
 					}
 				}
 			}
@@ -92,7 +111,7 @@ tasks.named(JavaPlugin.JAR_TASK_NAME) {
 	bundle {
 		bnd("""
 Bundle-Description: ${project.description}
-Bundle-DocURL: https://www.osgi.org
+Bundle-DocURL: https://eclipse-osgi-technology.github.io/osgi-test/
 Bundle-License: "Apache-2.0";link="https://opensource.org/licenses/Apache-2.0";description="Apache License, Version 2.0"
 Bundle-Name: ${project.group}:${project.name}
 Bundle-Vendor: OSGi Working Group

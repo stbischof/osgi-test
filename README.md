@@ -43,23 +43,23 @@ You can use your system `mvn` but we require a recent version.
 
 - `./mvnw clean install` - Assembles and tests the project
 
-[![Build Status](https://github.com/osgi/osgi-test/workflows/CI%20Build/badge.svg)](https://github.com/osgi/osgi-test/actions?query=workflow%3A%22CI%20Build%22)
+[![Build Status](https://github.com/eclipse-osgi-technology/osgi-test/actions/workflows/cibuild.yml/badge.svg)](https://github.com/eclipse-osgi-technology/osgi-test/actions/workflows/cibuild.yml)
 
 ## Code Quality
 
-We use [CodeQL](https://github.com/osgi/osgi-test/blob/main/.github/workflows/codeql-analysis.yml) for continuous security analysis.
+We use [CodeQL](https://github.com/eclipse-osgi-technology/osgi-test/blob/main/.github/workflows/codeql-analysis.yml) for continuous security analysis.
 
 ## Repository
 
-Release versions of osgi-test bundles are available on Maven Central under the `org.osgi` group ID. You can find them [here](https://search.maven.org/search?q=a:org.osgi.test.*).
+Release versions of osgi-test bundles are available on Maven Central under the `org.osgi` group ID. You can find them [here](https://central.sonatype.com/search?q=org.osgi.test).
 
-For those who want the bleeding edge, snapshot artifacts are published to the Sonatype OSS repository:
+For those who want the bleeding edge, snapshot artifacts are published to the Maven Central snapshots repository:
 
-[https://oss.sonatype.org/content/repositories/snapshots/](https://oss.sonatype.org/content/repositories/snapshots/)
+[https://central.sonatype.com/repository/maven-snapshots/](https://central.sonatype.com/repository/maven-snapshots/)
 
 ## Future work
 
-See the [open issues](https://github.com/osgi/osgi-test/issues) for the list of outstanding TODOs.
+See the [open issues](https://github.com/eclipse-osgi-technology/osgi-test/issues) for the list of outstanding TODOs.
 
 ## License
 
