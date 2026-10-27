@@ -1,116 +1,17 @@
-#*******************************************************************************
-# Copyright (c) Contributors to the Eclipse Foundation
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# SPDX-License-Identifier: Apache-2.0
-#*******************************************************************************
-
-name: Release
-
+# CI logic lives in eclipse-osgi-technology/.github (reusable workflow).
+# A release is cut by pushing a tag that equals the version (no prefix), or
+# by publishing a GitHub release with that new tag; the central workflow
+# refuses a tag that does not match .mvn/maven.config.
+name: release
 on:
-  release:
-    types:
-    - published
-
-env:
-  LC_ALL: en_US.UTF-8
-  MAVEN_OPTS: >-
-    -Dhttp.keepAlive=false
-    -Dmaven.wagon.http.pool=false
-    -Dmaven.wagon.http.retryHandler.count=3
-
-defaults:
-  run:
-    shell: bash
-
+  push:
+    tags:
+      - '[0-9]*.[0-9]*.[0-9]*'
 permissions:
   contents: read
-
 jobs:
   release:
-    if: github.repository == 'eclipse-osgi-technology/osgi-test'
-    name: Release ${{ github.event.release.tag_name }}
-    runs-on: ubuntu-latest
-    steps:
-    - name: Harden Runner
-      uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2
-      with:
-        egress-policy: audit
-
-    - name: Verify deployment secrets are configured
-      run: |
-        MISSING=""
-        if [[ -z "${SECRET_GPG_KEY}" ]]; then MISSING="${MISSING} GPG_PRIVATE_KEY"; fi
-        if [[ -z "${SECRET_GPG_PASS}" ]]; then MISSING="${MISSING} GPG_PASSPHRASE"; fi
-        if [[ -z "${SECRET_SONATYPE_USER}" ]]; then MISSING="${MISSING} CENTRAL_SONATYPE_TOKEN_USERNAME"; fi
-        if [[ -z "${SECRET_SONATYPE_PASS}" ]]; then MISSING="${MISSING} CENTRAL_SONATYPE_TOKEN_PASSWORD"; fi
-        if [[ -n "${MISSING}" ]]; then
-          echo "::error::Missing required deployment secrets:${MISSING}"
-          exit 1
-        fi
-      env:
-        SECRET_GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        SECRET_GPG_PASS: ${{ secrets.GPG_PASSPHRASE }}
-        SECRET_SONATYPE_USER: ${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}
-        SECRET_SONATYPE_PASS: ${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}
-    - name: Install gpg secret key
-      run: |
-        cat <(echo -e "${{ secrets.GPG_PRIVATE_KEY }}") | gpg --batch --import
-        gpg --list-secret-keys --keyid-format LONG
-    - name: Git Checkout
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-    - name: Set up Java
-      uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-        cache: 'maven'
-        server-id: central
-        server-username-env-var: MAVEN_USERNAME
-        server-password-env-var: MAVEN_PASSWORD
-        gpg-passphrase-env-var: PASSPHRASE
-        # Maven 3.10 offers the credentials of a server only to the origins
-        # bound to its id, and the id central is bound to
-        # repo.maven.apache.org: the token has to reach central.sonatype.com
-        mvn-server-repository-origins: |
-          central:https://central.sonatype.com
-    - name: Validate release version against tag
-      id: version
-      run: |
-        # The tag is the release version, e.g. 1.4.0 or 1.4.0.RC1
-        if [[ ! "${TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9A-Za-z_-]+)?$ ]] || [[ "${TAG}" == *SNAPSHOT* ]]; then
-          echo "::error::Release tag '${TAG}' must be a release version like 1.4.0 or 1.4.0.RC1"
-          exit 1
-        fi
-        # The tagged commit must be on the way to this release, e.g. 1.4.0-SNAPSHOT for 1.4.0
-        SNAPSHOT=$(sed -n 's/^-Drevision=//p' .mvn/maven.config)
-        BASE="${SNAPSHOT%-SNAPSHOT}"
-        echo "Release version: ${TAG}, version in .mvn/maven.config: ${SNAPSHOT}"
-        if [[ "${TAG}" != "${BASE}" && "${TAG}" != "${BASE}".* ]]; then
-          echo "::error::Release tag '${TAG}' does not match ${SNAPSHOT} in .mvn/maven.config of the tagged commit"
-          exit 1
-        fi
-        echo "version=${TAG}" >> "${GITHUB_OUTPUT}"
-      env:
-        TAG: ${{ github.event.release.tag_name }}
-    - name: Build
-      run: |
-        ./mvnw -B --no-transfer-progress -Drevision=${{ steps.version.outputs.version }} install
-    - name: Deploy
-      run: |
-        ./mvnw -B --no-transfer-progress -Drevision=${{ steps.version.outputs.version }} -Pdeploy clean deploy
-      env:
-        MAVEN_USERNAME: ${{ secrets.CENTRAL_SONATYPE_TOKEN_USERNAME }}
-        MAVEN_PASSWORD: ${{ secrets.CENTRAL_SONATYPE_TOKEN_PASSWORD }}
-        PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+    uses: eclipse-osgi-technology/.github/.github/workflows/maven-release.yml@main
+    secrets: inherit
+    with:
+      jdk: '17'

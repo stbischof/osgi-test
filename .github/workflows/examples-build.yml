@@ -80,7 +80,7 @@ jobs:
     - name: Build Maven Example
       if: matrix.example == 'mvn'
       run: |
-        ./mvnw -B --no-transfer-progress --file examples/osgi-test-example-mvn verify
+        mvn -B --no-transfer-progress --file examples/osgi-test-example-mvn verify
     - name: Build Gradle Example
       if: matrix.example == 'gradle'
       run: |

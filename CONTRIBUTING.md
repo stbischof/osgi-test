@@ -13,13 +13,14 @@ This information will help us review and fix your issue faster.
 ## Build Environment
 
 The only thing you need to build Java. We require at least Java 8.
-We use Maven to build and the repo includes `mvnw`.
-You can use your system `mvn` but we require a recent version.
+We use Maven to build and require a recent version.
 
-- `./mvnw clean install` - Assembles and tests the project
+- `mvn clean install` - Assembles and tests the project
 
-We use [GitHub Actions](https://github.com/eclipse-osgi-technology/osgi-test/actions?query=workflow%3A%22CI%20Build%22) and the repo includes a
-`.github/workflows/cibuild.yml` file to build with GitHub Actions.
+We use [GitHub Actions](https://github.com/eclipse-osgi-technology/osgi-test/actions/workflows/build.yml).
+The workflows in `.github/workflows` are stubs that call the reusable workflows of
+[eclipse-osgi-technology/.github](https://github.com/eclipse-osgi-technology/.github);
+`build.yml` chooses the JDKs the project is built and tested with.
 
 ## Releasing
 
@@ -27,21 +28,17 @@ The version is set in one place, `-Drevision=...` in [`.mvn/maven.config`](.mvn/
 On `main` it is always the next version with `-SNAPSHOT`, and every push to `main`
 deploys snapshot artifacts.
 
-To release, a maintainer:
+To release 1.4.0, a maintainer:
 
-1. Checks that the CI build of `main` is green and that `.mvn/maven.config` holds the
-   version to release, e.g. `-Drevision=1.4.0-SNAPSHOT` for 1.4.0.
-2. [Drafts a new GitHub release](https://github.com/eclipse-osgi-technology/osgi-test/releases/new)
-   on `main` with a new tag named exactly like the version, e.g. `1.4.0`, or `1.4.0.RC1`
-   for a release candidate marked as pre-release.
-3. Publishes the release. The `.github/workflows/release.yml` workflow builds and tests
-   the tag with `-Drevision=<tag>` and deploys the signed artifacts to Maven Central.
-4. Opens a pull request that moves `.mvn/maven.config` to the next snapshot version,
-   e.g. `-Drevision=1.5.0-SNAPSHOT`.
+1. Merges a pull request that sets `.mvn/maven.config` to `-Drevision=1.4.0`.
+2. [Publishes a new GitHub release](https://github.com/eclipse-osgi-technology/osgi-test/releases/new)
+   on that commit with the new tag `1.4.0`, or pushes the tag `1.4.0`. The
+   `.github/workflows/release.yml` workflow checks that the tag equals the version,
+   builds it and deploys the signed artifacts to Maven Central.
+3. Merges a pull request that moves `.mvn/maven.config` to `-Drevision=1.5.0-SNAPSHOT`.
 
-If the workflow fails, re-run it from the Actions tab. If the tagged commit needs a fix,
-delete the release and its tag and create them again on the fixed commit. A version that
-has reached Maven Central cannot be released again.
+If the workflow fails, re-run it from the Actions tab. A version that has reached
+Maven Central cannot be released again.
 
 ## Workflow
 
