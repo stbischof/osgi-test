@@ -92,7 +92,7 @@ jobs:
     needs: build
     if: >-
       github.repository == 'eclipse-osgi-technology/osgi-test'
-      && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/release')
+      && github.ref == 'refs/heads/main'
       && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
@@ -123,20 +123,13 @@ jobs:
         gpg --list-secret-keys --keyid-format LONG
     - name: Git Checkout
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-    - name: Validate version against branch
+    - name: Validate snapshot version
       run: |
         VERSION=$(./mvnw -B -q help:evaluate -Dexpression=revision -DforceStdout)
         echo "Project version: ${VERSION}"
-        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-          if [[ "${VERSION}" != *-SNAPSHOT ]]; then
-            echo "::error::main branch requires a SNAPSHOT version, but found: ${VERSION}"
-            exit 1
-          fi
-        elif [[ "${{ github.ref }}" == "refs/heads/release" ]]; then
-          if [[ "${VERSION}" == *-SNAPSHOT ]]; then
-            echo "::error::release branch requires a release version (no -SNAPSHOT), but found: ${VERSION}"
-            exit 1
-          fi
+        if [[ "${VERSION}" != *-SNAPSHOT ]]; then
+          echo "::error::main branch requires a SNAPSHOT version in .mvn/maven.config, but found: ${VERSION}"
+          exit 1
         fi
     - name: Set up Java
       uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
