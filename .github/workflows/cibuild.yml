@@ -125,7 +125,7 @@ jobs:
       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
     - name: Validate snapshot version
       run: |
-        VERSION=$(./mvnw -B -q help:evaluate -Dexpression=revision -DforceStdout)
+        VERSION=$(sed -n 's/^-Drevision=//p' .mvn/maven.config)
         echo "Project version: ${VERSION}"
         if [[ "${VERSION}" != *-SNAPSHOT ]]; then
           echo "::error::main branch requires a SNAPSHOT version in .mvn/maven.config, but found: ${VERSION}"

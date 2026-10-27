@@ -94,7 +94,7 @@ jobs:
           exit 1
         fi
         # The tagged commit must be on the way to this release, e.g. 1.4.0-SNAPSHOT for 1.4.0
-        SNAPSHOT=$(./mvnw -B -q help:evaluate -Dexpression=revision -DforceStdout)
+        SNAPSHOT=$(sed -n 's/^-Drevision=//p' .mvn/maven.config)
         BASE="${SNAPSHOT%-SNAPSHOT}"
         echo "Release version: ${TAG}, version in .mvn/maven.config: ${SNAPSHOT}"
         if [[ "${TAG}" != "${BASE}" && "${TAG}" != "${BASE}".* ]]; then
